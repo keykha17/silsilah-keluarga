@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-neutral-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peta Silsilah Keluarga</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f9fafb',
+              100: '#f3f4f6',
+              200: '#e5e7eb',
+              300: '#d1d5db',
+              400: '#9ca3af',
+              500: '#6b7280',
+              600: '#4b5563',
+              700: '#374151',
+              800: '#1f2937',
+              900: '#111827',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Vis.js Network -->
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #tree-canvas {
+      width: 100%;
+      height: 100%;
+      min-height: 480px;
+      background-size: 20px 20px;
+      background-image: radial-gradient(circle, #e5e7eb 1px, transparent 1px);
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #9ca3af;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #6b7280;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col text-neutral-800 bg-neutral-100 antialiased selection:bg-gray-400 selection:text-black">
+
+  <header class="bg-neutral-900 border-b border-neutral-800 text-white sticky top-0 z-30 shadow-md">
+  <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    
+    <!-- App Brand -->
+    <div class="flex items-center space-x-2.5">
+      <div class="w-9 h-9 rounded-xl bg-gray-400 text-neutral-950 flex items-center justify-center font-bold shadow-md">
+        <i class="fa-solid fa-sitemap text-lg"></i>
+      </div>
+      <div>
+        <h1 class="text-sm font-bold text-white leading-tight flex items-center gap-1.5">
+          Silsilah Keluarga
+          <span class="text-[10px] bg-gray-400 text-neutral-950 px-2 py-0.5 rounded-md font-bold">Pusat SAYA</span>
+        </h1>
+        <p class="text-[11px] text-neutral-400 font-medium">Sistem Pemetaan Keluarga</p>
+      </div>
+    </div>
+
+    <!-- Mode Switcher & Action Buttons Header (ml-auto dihapus) -->
+    <div class="flex items-center gap-1.5 flex-wrap w-full sm:w-auto justify-start">
+      
+      <!-- Mode Toggle Switch -->
+      <div class="bg-neutral-800 p-1 rounded-xl flex items-center border border-neutral-700">
+        <button id="btnModeEdit" onclick="setEditMode(true)" class="px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gray-400 text-neutral-950">
+          <i class="fa-solid fa-pen-to-square"></i>
+          <span class="hidden sm:inline">Edit</span>
+        </button>
+        <button id="btnModeView" onclick="setEditMode(false)" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-neutral-400 hover:text-white transition flex items-center gap-1">
+          <i class="fa-solid fa-eye"></i>
+          <span class="hidden sm:inline">Lihat Saja</span>
+        </button>
+      </div>
+
+      <div class="h-5 w-px bg-neutral-800 mx-0.5"></div>
+
+      <!-- Action Buttons -->
+      <button id="btnHeaderAddMember" onclick="openAddMemberModal()" class="bg-gray-400 hover:bg-gray-300 text-neutral-950 text-xs font-bold px-3 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5 active:scale-95">
+        <i class="fa-solid fa-user-plus text-xs"></i>
+        <span class="hidden sm:inline">Tambah Kerabat</span>
+      </button>
+
+      <button onclick="exportJSON()" class="p-2 sm:px-2.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-xl text-xs font-medium transition" title="Ekspor Data JSON">
+        <i class="fa-solid fa-download"></i>
+        <span class="hidden md:inline ml-1">JSON</span>
+      </button>
+
+      <label id="lblHeaderImport" class="p-2 sm:px-2.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-xl text-xs font-medium transition cursor-pointer" title="Impor Data JSON">
+        <i class="fa-solid fa-upload"></i>
+        <span class="hidden md:inline ml-1">Impor</span>
+        <input type="file" id="importJsonInput" accept=".json" class="hidden" onchange="importJSON(event)">
+      </label>
+
+      <!-- SVG Export Button -->
+      <button onclick="exportSVG()" class="p-2 sm:px-2.5 bg-neutral-800 hover:bg-neutral-700 text-yellow-400 rounded-xl text-xs font-bold transition border border-yellow-500/30" title="Cetak Vektor SVG">
+        <i class="fa-solid fa-vector-square"></i>
+        <span class="hidden md:inline ml-1">Cetak SVG (Spanduk)</span>
+      </button>
+
+      <button id="btnHeaderReset" onclick="resetDataConfirmation()" class="p-2 text-neutral-400 hover:bg-neutral-800 hover:text-white rounded-xl text-xs transition" title="Reset Data">
+        <i class="fa-solid fa-rotate-left"></i>
+      </button>
+    </div>
+
+  </div>
+</header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+    <!-- Left Control Panel (4 Cols) -->
+    <section class="lg:col-span-4 flex flex-col gap-3.5">
+
+      <!-- Center User "SAYA" Profile Card -->
+      <div id="meCard" class="bg-neutral-900 text-white rounded-2xl p-4 shadow-sm border-2 border-gray-400 relative overflow-hidden">
+        <div class="flex items-center gap-3.5 relative z-10">
+          <div class="relative">
+            <img id="meAvatar" src="" onerror="this.src=getDefaultAvatarSVG('L')" class="w-14 h-14 rounded-2xl bg-white p-1 object-cover shadow-sm border border-neutral-700">
+            <span class="absolute -top-1.5 -right-1.5 bg-gray-400 text-neutral-950 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shadow-sm">
+              <i class="fa-solid fa-star"></i>
+            </span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <span class="text-[10px] font-bold uppercase tracking-wider bg-gray-400 text-neutral-950 px-2 py-0.5 rounded-md">PUSAT SILSILAH (SAYA)</span>
+            <h2 id="meName" class="text-sm font-bold truncate mt-1 text-white">Memuat data...</h2>
+            <p id="meDetails" class="text-xs text-neutral-400 truncate"></p>
+          </div>
+          <button id="btnEditMe" onclick="openEditMeModal()" class="bg-neutral-800 hover:bg-neutral-700 text-gray-400 border border-neutral-700 p-2 rounded-xl text-xs transition flex-shrink-0" title="Edit Profil Saya">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Statistics Panel -->
+      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-neutral-200">
+        <div class="flex items-center justify-between mb-2.5">
+          <span class="text-[11px] font-bold text-neutral-500 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-chart-pie text-gray-600"></i> Statistik Silsilah
+          </span>
+          <span id="statTotalGenerations" class="text-xs font-bold text-neutral-900 bg-gray-100 px-2 py-0.5 rounded-lg border border-gray-300">0 Generasi</span>
+        </div>
+        <div class="grid grid-cols-4 gap-2 text-center">
+          <div class="bg-neutral-50 p-2 rounded-xl border border-neutral-200">
+            <div id="statTotal" class="text-base font-bold text-neutral-900">0</div>
+            <div class="text-[10px] text-neutral-500 font-medium">Total</div>
+          </div>
+          <div class="bg-neutral-50 p-2 rounded-xl border border-neutral-200">
+            <div id="statMale" class="text-base font-bold text-neutral-800">0</div>
+            <div class="text-[10px] text-neutral-500 font-medium">Pria</div>
+          </div>
+          <div class="bg-neutral-50 p-2 rounded-xl border border-neutral-200">
+            <div id="statFemale" class="text-base font-bold text-neutral-800">0</div>
+            <div class="text-[10px] text-neutral-500 font-medium">Wanita</div>
+          </div>
+          <div class="bg-gray-50 p-2 rounded-xl border border-gray-200">
+            <div id="statAlive" class="text-base font-bold text-gray-700">0</div>
+            <div class="text-[10px] text-gray-800 font-medium">Hidup</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Member Search & List -->
+      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-neutral-200 flex-1 flex flex-col min-h-[260px]">
+        <div class="space-y-2 mb-2.5">
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-neutral-400 text-xs"></i>
+            <input type="text" id="searchInput" oninput="renderMemberList()" placeholder="Cari nama anggota..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-neutral-50 border border-neutral-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-gray-400 outline-none transition">
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <select id="filterGender" onchange="renderMemberList()" class="text-xs bg-neutral-50 border border-neutral-300 rounded-xl p-1.5 outline-none font-medium text-neutral-700">
+              <option value="">Semua Gender</option>
+              <option value="L">Laki-Laki</option>
+              <option value="P">Perempuan</option>
+            </select>
+            <select id="filterStatus" onchange="renderMemberList()" class="text-xs bg-neutral-50 border border-neutral-300 rounded-xl p-1.5 outline-none font-medium text-neutral-700">
+              <option value="">Semua Status</option>
+              <option value="Masih Hidup">Masih Hidup</option>
+              <option value="Sudah Meninggal">Wafat</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Scrollable List -->
+        <div class="flex-1 overflow-y-auto pr-1 space-y-1.5 max-h-[220px]" id="memberListContainer">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Legend Panel -->
+      <div class="bg-white rounded-2xl p-3 shadow-sm border border-neutral-200 text-xs text-neutral-700">
+        <h4 class="font-bold text-neutral-400 text-[10px] uppercase tracking-wider mb-2">Keterangan Garis & Warna</h4>
+        <div class="grid grid-cols-2 gap-y-1.5 gap-x-2 text-[11px]">
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded-md bg-gray-300 border border-neutral-900 inline-block"></span>
+            <span class="font-bold text-neutral-900">Pusat (SAYA)</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded-md bg-neutral-100 border border-neutral-600 inline-block"></span>
+            <span>Laki-Laki</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded-md bg-gray-50 border border-gray-500 inline-block"></span>
+            <span>Perempuan</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-3 h-3 rounded-md bg-neutral-200 border border-neutral-400 inline-block"></span>
+            <span>Wafat</span>
+          </div>
+          <div class="flex items-center gap-1.5 col-span-2">
+            <span class="w-4 h-0.5 bg-neutral-900 inline-block"></span>
+            <span>Garis Keturunan (Anak)</span>
+          </div>
+          <div class="flex items-center gap-1.5 col-span-2">
+            <span class="w-4 h-0.5 border-t-2 border-dashed border-gray-600 inline-block"></span>
+            <span>Garis Pernikahan (Pasangan)</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="lg:col-span-8 flex flex-col gap-3">
+      
+      <!-- View Control Switcher -->
+      <div class="bg-white p-2 rounded-2xl shadow-sm border border-neutral-200 flex flex-wrap justify-between items-center gap-2">
+        <div class="flex items-center bg-neutral-100 p-1 rounded-xl border border-neutral-200">
+          <button id="btnViewTree" onclick="switchView('tree')" class="px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm bg-neutral-900 text-white">
+            <i class="fa-solid fa-sitemap mr-1"></i> Bagan Hirarki
+          </button>
+          <button id="btnViewNetwork" onclick="switchView('network')" class="px-3 py-1 rounded-lg text-xs font-semibold text-neutral-600 transition hover:text-neutral-900">
+            <i class="fa-solid fa-circle-nodes mr-1"></i> Network Free
+          </button>
+          <button id="btnViewCards" onclick="switchView('cards')" class="px-3 py-1 rounded-lg text-xs font-semibold text-neutral-600 transition hover:text-neutral-900">
+            <i class="fa-solid fa-border-all mr-1"></i> Kartu Grid
+          </button>
+        </div>
+
+        <div id="graphZoomControls" class="flex items-center gap-1">
+          <button onclick="zoomGraph(0.2)" class="w-7 h-7 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 rounded-lg text-neutral-800 text-xs font-bold transition flex items-center justify-center">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+          <button onclick="zoomGraph(-0.2)" class="w-7 h-7 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 rounded-lg text-neutral-800 text-xs font-bold transition flex items-center justify-center">
+            <i class="fa-solid fa-minus"></i>
+          </button>
+          <button onclick="fitGraph()" class="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-neutral-900 border border-gray-300 rounded-lg text-xs font-bold transition">
+            <i class="fa-solid fa-compress mr-1"></i> Reset View
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Canvas Container -->
+      <div id="canvas-wrapper" class="bg-white rounded-2xl shadow-sm border border-neutral-200 flex-1 relative min-h-[500px] overflow-hidden flex flex-col">
+        
+        <!-- Vis.js Canvas -->
+        <div id="tree-canvas" class="flex-1"></div>
+
+        <!-- Cards View Grid -->
+        <div id="cards-view" class="hidden absolute inset-0 bg-neutral-50 p-4 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Floating Hint -->
+        <div class="absolute bottom-3 left-3 bg-neutral-900/90 text-white backdrop-blur-md px-3 py-1.5 rounded-xl text-[11px] font-medium shadow-md pointer-events-none flex items-center gap-1.5">
+          <i class="fa-solid fa-hand-pointer text-gray-400"></i> Klik anggota di bagan untuk melihat detail.
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <div id="initMeModal" class="fixed inset-0 bg-neutral-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
+    <div class="bg-white rounded-3xl shadow-2xl border border-neutral-300 max-w-md w-full overflow-hidden my-8">
+      <div class="bg-neutral-900 p-6 text-white text-center relative border-b-4 border-gray-400">
+        <div class="w-14 h-14 bg-gray-400 text-neutral-950 rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-md mb-2">
+          <i class="fa-solid fa-crown"></i>
+        </div>
+        <h3 class="text-lg font-bold text-white">Silsilah Keluarga Baru</h3>
+        <p class="text-xs text-neutral-400 mt-0.5">Masukkan data diri Anda ("SAYA") sebagai titik awal.</p>
+      </div>
+
+      <form id="initMeForm" onsubmit="saveInitMe(event)" class="p-5 space-y-3.5 text-xs">
+        <div>
+          <label class="block font-bold text-neutral-700 uppercase mb-1">Nama Lengkap <span class="text-neutral-900">*</span></label>
+          <input type="text" id="initName" required placeholder="Contoh: Muhammad Khalil" class="w-full p-2.5 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-gray-400 outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Nama Panggilan</label>
+            <input type="text" id="initNickname" placeholder="Khalil" class="w-full p-2.5 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-gray-400 outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Jenis Kelamin <span class="text-neutral-900">*</span></label>
+            <select id="initGender" required class="w-full p-2.5 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-gray-400 outline-none font-medium">
+              <option value="L">Laki-Laki</option>
+              <option value="P">Perempuan</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Tanggal Lahir</label>
+            <input type="date" id="initBirthDate" class="w-full p-2.5 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-gray-400 outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Pekerjaan</label>
+            <input type="text" id="initJob" placeholder="Pekerjaan / Profesi" class="w-full p-2.5 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-gray-400 outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-neutral-700 uppercase mb-1">Upload Foto Profil (Lokal)</label>
+          <input type="file" id="initPhotoFile" accept="image/*" onchange="previewInitPhoto(this)" class="w-full text-xs p-1.5 border border-neutral-300 rounded-xl file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-neutral-900 file:text-white hover:file:bg-gray-500 hover:file:text-black">
+          <input type="hidden" id="initPhotoData">
+          <div id="initPhotoPreviewBox" class="hidden mt-2 flex items-center gap-2 bg-neutral-50 p-2 rounded-xl border border-neutral-200">
+            <img id="initPhotoPreviewImg" src="" class="w-10 h-10 rounded-lg object-cover border border-neutral-300">
+            <span class="text-[11px] text-neutral-600 font-medium">Foto terpilih untuk profil</span>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full py-3 bg-gray-400 hover:bg-gray-500 text-neutral-950 font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 mt-2">
+          <span>Buat Peta Silsilah Saya</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div id="memberModal" class="fixed inset-0 bg-neutral-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
+    <div class="bg-white rounded-3xl shadow-2xl border border-neutral-300 max-w-lg w-full overflow-hidden my-6">
+      
+      <div id="memberModalHeader" class="bg-neutral-900 p-4 text-white flex justify-between items-center border-b-2 border-gray-400">
+        <h3 id="memberModalTitle" class="font-bold text-xs sm:text-sm flex items-center gap-2 text-white">
+          <i class="fa-solid fa-user-plus text-gray-400"></i> Tambah Kerabat Keluarga
+        </h3>
+        <button onclick="closeMemberModal()" class="text-neutral-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="memberForm" onsubmit="saveMemberForm(event)" class="p-5 space-y-3 max-h-[80vh] overflow-y-auto text-xs">
+        <input type="hidden" id="formMemberId">
+
+        <div id="relationSelectGroup" class="bg-gray-50 p-3 rounded-2xl border border-gray-200">
+          <label class="block font-bold text-neutral-900 uppercase tracking-wider mb-1 text-[10px]">
+            <i class="fa-solid fa-link text-gray-600 mr-1"></i> Hubungan Terhadap:
+          </label>
+          <div class="grid grid-cols-2 gap-2">
+            <select id="targetMemberId" onchange="updateRelationOptions()" class="p-2 border border-neutral-300 rounded-xl outline-none font-semibold text-neutral-800 bg-white">
+            </select>
+            <select id="relationType" class="p-2 border border-neutral-300 rounded-xl outline-none font-bold text-neutral-900 bg-white">
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <div class="col-span-2">
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Nama Lengkap <span class="text-neutral-900">*</span></label>
+            <input type="text" id="formFullName" required placeholder="Contoh: Budi Santoso" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-gray-400">
+          </div>
+          <div>
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Panggilan</label>
+            <input type="text" id="formNickname" placeholder="Budi" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-gray-400">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Jenis Kelamin <span class="text-neutral-900">*</span></label>
+            <select id="formGender" required class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-gray-400 font-medium">
+              <option value="L">Laki-Laki</option>
+              <option value="P">Perempuan</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Status Kehidupan</label>
+            <select id="formIsAlive" onchange="toggleDeathDate()" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-gray-400 font-medium">
+              <option value="true">Masih Hidup</option>
+              <option value="false">Sudah Meninggal</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Tanggal Lahir</label>
+            <input type="date" id="formBirthDate" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-gray-400">
+          </div>
+          <div id="deathDateContainer" class="hidden">
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Tanggal Wafat</label>
+            <input type="date" id="formDeathDate" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-gray-400">
+          </div>
+          <div id="birthPlaceContainer">
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Tempat Lahir</label>
+            <input type="text" id="formBirthPlace" placeholder="Jakarta" class="w-full p-2 border border-neutral-300 rounded-xl outline-none">
+          </div>
+        </div>
+
+        <div class="bg-neutral-50 p-3 rounded-2xl border border-neutral-200 space-y-2">
+          <label class="block font-bold text-neutral-800 uppercase tracking-wider text-[10px]">
+            <i class="fa-solid fa-image text-gray-600 mr-1"></i> Foto Anggota Keluarga
+          </label>
+          <div>
+            <span class="block text-[11px] text-neutral-500 font-semibold mb-1">Option A: Upload Foto dari Komputer/HP</span>
+            <input type="file" id="formPhotoFile" accept="image/*" onchange="previewFormPhoto(this)" class="w-full text-xs p-1 border border-neutral-300 rounded-xl file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-neutral-900 file:text-white hover:file:bg-gray-500 hover:file:text-black">
+          </div>
+          <div id="formPhotoPreviewContainer" class="hidden flex items-center justify-between bg-white p-2 rounded-xl border border-neutral-200">
+            <div class="flex items-center gap-2">
+              <img id="formPhotoPreviewImg" src="" class="w-10 h-10 rounded-lg object-cover border border-neutral-300">
+              <span class="text-[11px] text-neutral-700 font-medium">Foto Lokal Siap Disimpan</span>
+            </div>
+            <button type="button" onclick="clearUploadedFormPhoto()" class="text-neutral-900 hover:text-black text-xs px-2 py-1 font-bold">Hapus</button>
+          </div>
+          <input type="hidden" id="formPhotoData">
+          <div>
+            <span class="block text-[11px] text-neutral-500 font-semibold mb-1">Option B: URL Gambar Web (Opsional)</span>
+            <input type="url" id="formPhotoUrl" placeholder="https://..." class="w-full p-2 border border-neutral-300 rounded-xl outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Pekerjaan</label>
+            <input type="text" id="formJob" placeholder="Profesi / Pekerjaan" class="w-full p-2 border border-neutral-300 rounded-xl outline-none">
+          </div>
+          <div>
+            <label class="block font-bold text-neutral-700 uppercase mb-1">No. WhatsApp / HP</label>
+            <input type="text" id="formPhone" placeholder="0812..." class="w-full p-2 border border-neutral-300 rounded-xl outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-neutral-700 uppercase mb-1">Kota / Alamat Singkat</label>
+          <input type="text" id="formAddress" placeholder="Bandung" class="w-full p-2 border border-neutral-300 rounded-xl outline-none">
+        </div>
+
+        <div>
+          <label class="block font-bold text-neutral-700 uppercase mb-1">Catatan Khusus</label>
+          <textarea id="formNotes" rows="2" placeholder="Catatan memori atau silsilah..." class="w-full p-2 border border-neutral-300 rounded-xl outline-none"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2 border-t border-neutral-200">
+          <button type="button" onclick="closeMemberModal()" class="px-3.5 py-1.5 border border-neutral-300 text-neutral-700 rounded-xl font-semibold hover:bg-neutral-100">Batal</button>
+          <button type="submit" class="px-4 py-1.5 bg-gray-400 hover:bg-gray-500 text-neutral-950 rounded-xl font-bold shadow-sm flex items-center gap-1.5">
+            <i class="fa-solid fa-floppy-disk"></i> Simpan Data
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="detailModal" class="fixed inset-0 bg-neutral-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
+    <div class="bg-white rounded-3xl shadow-2xl border border-neutral-300 max-w-md w-full overflow-hidden my-6">
+      
+      <div id="detailHeader" class="p-5 text-white bg-neutral-900 border-b-2 border-gray-400 relative">
+        <button onclick="closeDetailModal()" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="flex items-center gap-3.5">
+          <div class="relative">
+            <img id="detailAvatar" src="" onerror="this.src=getDefaultAvatarSVG('L')" class="w-14 h-14 rounded-2xl bg-white p-1 object-cover shadow-sm border border-neutral-700">
+            <span id="detailBadgeCrown" class="hidden absolute -top-1.5 -right-1.5 bg-gray-400 text-neutral-950 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shadow-sm">
+              <i class="fa-solid fa-star"></i>
+            </span>
+          </div>
+          <div>
+            <h3 id="detailName" class="text-base font-bold text-white">Nama Anggota</h3>
+            <span id="detailRelationBadge" class="inline-block mt-0.5 px-2 py-0.5 text-[10px] font-bold bg-gray-400 text-neutral-950 rounded-md">Relasi</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 space-y-2.5 text-xs">
+        <div class="grid grid-cols-2 gap-2 pb-2 border-b border-neutral-100">
+          <div>
+            <span class="text-neutral-400 block text-[10px] uppercase font-bold">Gender</span>
+            <span id="detailGender" class="font-bold text-neutral-800">-</span>
+          </div>
+          <div>
+            <span class="text-neutral-400 block text-[10px] uppercase font-bold">Status Kehidupan</span>
+            <span id="detailStatus" class="font-bold text-neutral-800">-</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pb-2 border-b border-neutral-100">
+          <div>
+            <span class="text-neutral-400 block text-[10px] uppercase font-bold">Lahir / Tempat</span>
+            <span id="detailBirth" class="font-semibold text-neutral-800">-</span>
+          </div>
+          <div>
+            <span class="text-neutral-400 block text-[10px] uppercase font-bold">Pekerjaan</span>
+            <span id="detailJob" class="font-semibold text-neutral-800">-</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pb-2 border-b border-neutral-100">
+          <div>
+            <span class="text-neutral-400 block text-[10px] uppercase font-bold">Kontak HP</span>
+            <span id="detailPhone" class="font-semibold text-neutral-800">-</span>
+          </div>
+          <div>
+            <span class="text-neutral-400 block text-[10px] uppercase font-bold">Kota / Alamat</span>
+            <span id="detailAddress" class="font-semibold text-neutral-800">-</span>
+          </div>
+        </div>
+
+        <div class="pb-2 border-b border-neutral-100">
+          <span class="text-neutral-400 block text-[10px] uppercase font-bold">Catatan Memory</span>
+          <p id="detailNotes" class="text-neutral-600 italic mt-0.5">-</p>
+        </div>
+
+        <div id="quickAddSection" class="pt-1">
+          <label class="block text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-1">
+            <i class="fa-solid fa-plus-circle text-gray-600 mr-1"></i> Tambah Kerabat Langsung:
+          </label>
+          <div class="grid grid-cols-3 gap-1.5" id="quickAddButtons">
+          </div>
+        </div>
+
+        <div id="detailModalActions" class="flex justify-between items-center pt-3 border-t border-neutral-100">
+          <button id="btnDeleteMember" onclick="" class="px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-xl text-xs font-semibold border border-neutral-300 flex items-center gap-1">
+            <i class="fa-solid fa-trash"></i> Hapus
+          </button>
+          <button id="btnEditMember" onclick="" class="px-3.5 py-1.5 bg-gray-400 hover:bg-gray-500 text-neutral-950 rounded-xl text-xs font-bold shadow-sm flex items-center gap-1">
+            <i class="fa-solid fa-user-pen"></i> Edit Data
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="fixed inset-0 bg-neutral-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
+    <div class="bg-white rounded-3xl shadow-2xl border border-neutral-300 max-w-sm w-full overflow-hidden p-5 text-center my-6">
+      <div class="w-12 h-12 bg-neutral-100 text-neutral-900 rounded-2xl flex items-center justify-center text-xl mx-auto mb-3 border border-neutral-300">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 id="confirmTitle" class="text-sm font-bold text-neutral-900 mb-1">Konfirmasi Hapus</h3>
+      <p id="confirmMessage" class="text-xs text-neutral-600 mb-5 leading-relaxed">Apakah Anda yakin ingin menghapus data ini?</p>
+      
+      <div class="flex justify-center gap-2">
+        <button onclick="closeConfirmModal()" class="w-1/2 py-2 border border-neutral-300 text-neutral-700 rounded-xl text-xs font-semibold hover:bg-neutral-100 transition">
+          Batal
+        </button>
+        <button id="confirmActionButton" class="w-1/2 py-2 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-bold shadow-sm transition">
+          Ya, Hapus
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-neutral-900 text-white border border-neutral-700 px-3.5 py-2.5 rounded-2xl shadow-xl transition-all transform translate-y-20 opacity-0 z-50 flex items-center gap-2.5 text-xs font-semibold">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-gray-400 text-sm"></i>
+    <span id="toastMessage">Notifikasi</span>
+  </div>
+
+  <script>
+    // --- APP STATE ---
+    const STORAGE_KEY = 'peta_silsilah_keluarga_v3';
+    let familyMembers = [];
+    let meId = null;
+    let currentView = 'tree';
+    let pendingConfirmAction = null;
+    let isEditMode = true;
+
+    let visNodes = new vis.DataSet([]);
+    let visEdges = new vis.DataSet([]);
+    let networkGraph = null;
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function getDefaultAvatarSVG(gender = 'L') {
+      const bg = gender === 'P' ? '#f3f4f6' : '#f3f4f6';
+      const fg = gender === 'P' ? '#4b5563' : '#374151';
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="${bg}"/><path d="M50 25 a15 15 0 1 0 0.1 0 Z M25 75 a25 25 0 0 1 50 0 Z" fill="${fg}"/></svg>`;
+      return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+    }
+
+    window.onload = function() {
+      loadData();
+      initVisNetwork();
+    };
+
+    function loadData() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          familyMembers = parsed.members || [];
+          meId = parsed.meId || null;
+        } catch(e) {
+          familyMembers = [];
+          meId = null;
+        }
+      }
+
+      if (!meId || familyMembers.length === 0) {
+        document.getElementById('initMeModal').classList.remove('hidden');
+      } else {
+        renderAll();
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        meId: meId,
+        members: familyMembers
+      }));
+    }
+
+    function setEditMode(enable) {
+      isEditMode = enable;
+      const btnEdit = document.getElementById('btnModeEdit');
+      const btnView = document.getElementById('btnModeView');
+
+      if (isEditMode) {
+        btnEdit.className = "px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gray-400 text-neutral-950";
+        btnView.className = "px-2.5 py-1 rounded-lg text-xs font-semibold text-neutral-400 hover:text-white transition flex items-center gap-1";
+        showToast("Mode Edit Aktif");
+      } else {
+        btnView.className = "px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gray-400 text-neutral-950";
+        btnEdit.className = "px-2.5 py-1 rounded-lg text-xs font-semibold text-neutral-400 hover:text-white transition flex items-center gap-1";
+        showToast("Mode Lihat Saja Aktif");
+      }
+
+      applyModeUI();
+    }
+
+    function applyModeUI() {
+      const btnAddMember = document.getElementById('btnHeaderAddMember');
+      const btnReset = document.getElementById('btnHeaderReset');
+      const lblImport = document.getElementById('lblHeaderImport');
+      const btnEditMe = document.getElementById('btnEditMe');
+
+      if (isEditMode) {
+        if (btnAddMember) btnAddMember.classList.remove('hidden');
+        if (btnReset) btnReset.classList.remove('hidden');
+        if (lblImport) lblImport.classList.remove('hidden');
+        if (btnEditMe) btnEditMe.classList.remove('hidden');
+      } else {
+        if (btnAddMember) btnAddMember.classList.add('hidden');
+        if (btnReset) btnReset.classList.add('hidden');
+        if (lblImport) lblImport.classList.add('hidden');
+        if (btnEditMe) btnEditMe.classList.add('hidden');
+      }
+    }
+
+    function openConfirmModal(title, message, onConfirm) {
+      document.getElementById('confirmTitle').innerText = title;
+      document.getElementById('confirmMessage').innerText = message;
+      pendingConfirmAction = onConfirm;
+
+      const actionBtn = document.getElementById('confirmActionButton');
+      actionBtn.onclick = function() {
+        if (pendingConfirmAction) pendingConfirmAction();
+        closeConfirmModal();
+      };
+
+      document.getElementById('confirmModal').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirmModal').classList.add('hidden');
+      pendingConfirmAction = null;
+    }
+
+    function previewInitPhoto(input) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        if (file.size > 2 * 1024 * 1024) {
+          showToast("Ukuran foto maksimal 2MB!", "error");
+          input.value = "";
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('initPhotoData').value = e.target.result;
+          document.getElementById('initPhotoPreviewImg').src = e.target.result;
+          document.getElementById('initPhotoPreviewBox').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function previewFormPhoto(input) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        if (file.size > 2 * 1024 * 1024) {
+          showToast("Ukuran foto maksimal 2MB!", "error");
+          input.value = "";
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('formPhotoData').value = e.target.result;
+          document.getElementById('formPhotoPreviewImg').src = e.target.result;
+          document.getElementById('formPhotoPreviewContainer').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function clearUploadedFormPhoto() {
+      document.getElementById('formPhotoFile').value = "";
+      document.getElementById('formPhotoData').value = "";
+      document.getElementById('formPhotoPreviewContainer').classList.add('hidden');
+    }
+
+    function saveInitMe(e) {
+      e.preventDefault();
+      const name = document.getElementById('initName').value.trim();
+      const nickname = document.getElementById('initNickname').value.trim();
+      const gender = document.getElementById('initGender').value;
+      const birthDate = document.getElementById('initBirthDate').value;
+      const job = document.getElementById('initJob').value.trim();
+      const uploadedPhoto = document.getElementById('initPhotoData').value;
+
+      if (!name) return;
+
+      const newMe = {
+        id: 1,
+        isMe: true,
+        name: name,
+        nickname: nickname || name.split(' ')[0],
+        gender: gender,
+        isAlive: true,
+        birthDate: birthDate,
+        birthPlace: "",
+        deathDate: "",
+        job: job,
+        photoUrl: uploadedPhoto || getDefaultAvatarSVG(gender),
+        phone: "",
+        address: "",
+        notes: "Pusat silsilah keluarga",
+        fatherId: null,
+        motherId: null,
+        spouseId: null,
+        childrenIds: []
+      };
+
+      familyMembers = [newMe];
+      meId = 1;
+
+      saveData();
+      document.getElementById('initMeModal').classList.add('hidden');
+      renderAll();
+      showToast("Profil SAYA berhasil dibuat!");
+    }
+
+    function renderAll() {
+      applyModeUI();
+      updateMeSummaryCard();
+      updateStatistics();
+      renderMemberList();
+      updateGraphData();
+      renderCardsView();
+    }
+
+    function updateMeSummaryCard() {
+      const me = familyMembers.find(m => m.id === meId);
+      if (!me) return;
+
+      document.getElementById('meName').innerText = me.name + (me.nickname ? ` (${me.nickname})` : '');
+      let details = `${me.gender === 'L' ? 'Pria' : 'Wanita'}`;
+      if (me.job) details += ` • ${me.job}`;
+      document.getElementById('meDetails').innerText = details;
+      document.getElementById('meAvatar').src = me.photoUrl || getDefaultAvatarSVG(me.gender);
+    }
+
+    function updateStatistics() {
+      const total = familyMembers.length;
+      const male = familyMembers.filter(m => m.gender === 'L').length;
+      const female = familyMembers.filter(m => m.gender === 'P').length;
+      const alive = familyMembers.filter(m => m.isAlive).length;
+
+      document.getElementById('statTotal').innerText = total;
+      document.getElementById('statMale').innerText = male;
+      document.getElementById('statFemale').innerText = female;
+      document.getElementById('statAlive').innerText = alive;
+      document.getElementById('statTotalGenerations').innerText = `${calculateGenerations()} Generasi`;
+    }
+
+    function calculateGenerations() {
+      if (familyMembers.length === 0) return 0;
+      let maxDepth = 1;
+      familyMembers.forEach(m => {
+        let depth = 1;
+        let curr = m;
+        while (curr && (curr.fatherId || curr.motherId)) {
+          depth++;
+          curr = familyMembers.find(p => p.id === (curr.fatherId || curr.motherId));
+        }
+        if (depth > maxDepth) maxDepth = depth;
+      });
+      return maxDepth;
+    }
+
+      function renderMemberList() {
+      const container = document.getElementById('memberListContainer');
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const genderFilter = document.getElementById('filterGender').value;
+      const statusFilter = document.getElementById('filterStatus').value;
+
+      const filtered = familyMembers.filter(m => {
+        const matchSearch = m.name.toLowerCase().includes(search) || (m.nickname && m.nickname.toLowerCase().includes(search));
+        const matchGender = !genderFilter || m.gender === genderFilter;
+        const matchStatus = !statusFilter || (statusFilter === 'Masih Hidup' ? m.isAlive : !m.isAlive);
+        return matchSearch && matchGender && matchStatus;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="text-center py-6 text-neutral-400 text-xs">Tidak ada data anggota</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(m => {
+        const isMe = m.id === meId;
+        const safePhoto = m.photoUrl || getDefaultAvatarSVG(m.gender);
+        const safeName = escapeHtml(m.name);
+        return `
+          <div onclick="openDetailModal(${m.id})" class="p-2 border ${isMe ? 'border-gray-400 bg-gray-50' : 'border-neutral-200 bg-white'} rounded-xl hover:border-neutral-800 transition cursor-pointer flex items-center justify-between group">
+            <div class="flex items-center gap-2 min-w-0">
+              <img src="${safePhoto}" onerror="this.src=getDefaultAvatarSVG('${m.gender}')" class="w-7 h-7 rounded-lg bg-neutral-100 object-cover flex-shrink-0 border border-neutral-300">
+              <div class="min-w-0">
+                <h4 class="text-xs font-bold text-neutral-800 truncate group-hover:text-black flex items-center gap-1">
+                  ${safeName}
+                  ${isMe ? '<span class="text-[9px] bg-gray-300 text-neutral-950 font-extrabold px-1 rounded">[SAYA]</span>' : ''}
+                </h4>
+                <p class="text-[10px] text-neutral-500 truncate">${m.gender === 'L' ? 'Laki-Laki' : 'Perempuan'} ${!m.isAlive ? '• Wafat' : ''}</p>
+              </div>
+            </div>
+            <i class="fa-solid fa-chevron-right text-[9px] text-neutral-400 group-hover:text-black"></i>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function initVisNetwork() {
+      const container = document.getElementById('tree-canvas');
+      const data = { nodes: visNodes, edges: visEdges };
+
+      const options = {
+        layout: {
+          hierarchical: {
+            enabled: currentView === 'tree',
+            direction: 'UD',
+            sortMethod: 'directed',
+            nodeSpacing: 260,       
+            levelSeparation: 160,
+            treeSpacing: 240,      
+            blockShifting: true,
+            edgeMinimization: true,
+            parentCentralization: true
+          }
+        },
+        physics: {
+          enabled: true,
+          solver: currentView === 'tree' ? 'hierarchicalRepulsion' : 'forceAtlas2Based',
+          hierarchicalRepulsion: {
+            centralGravity: 0.0,
+            springLength: 180,
+            springConstant: 0.01,
+            nodeDistance: 220,
+            damping: 0.09
+          },
+          forceAtlas2Based: {
+            gravitationalConstant: -100,
+            centralGravity: 0.01,
+            springLength: 150,
+            springConstant: 0.08,
+            avoidOverlap: 1
+          }
+        },
+        interaction: { hover: true, zoomView: true, dragView: true },
+        nodes: {
+          shape: 'box',
+          margin: { top: 10, bottom: 10, left: 14, right: 14 },
+          borderRadius: 12,
+          borderWidth: 2,
+          shadow: {
+            enabled: true,
+            color: 'rgba(0,0,0,0.06)',
+            size: 6,
+            x: 0,
+            y: 2
+          },
+          font: { 
+            face: 'Plus Jakarta Sans',
+            size: 13,
+            align: 'center'
+          }
+        },
+        edges: {
+          smooth: { type: 'cubicBezier', forceDirection: 'vertical', roundness: 0.4 }
+        }
+      };
+
+      networkGraph = new vis.Network(container, data, options);
+
+      networkGraph.on("click", function(params) {
+        if (params.nodes.length > 0) {
+          openDetailModal(params.nodes[0]);
+        }
+      });
+    }
+
+
+    function updateGraphData() {
+      visNodes.clear();
+      visEdges.clear();
+
+      const nodesArr = [];
+      const edgesArr = [];
+      const marriageEdges = new Set();
+
+      familyMembers.forEach(m => {
+        const isMe = m.id === meId;
+        const isMale = m.gender === 'L';
+
+        let bgColor = isMale ? '#f3f4f6' : '#f9fafb';
+        let borderColor = isMale ? '#374151' : '#4b5563';
+        let textColor = isMale ? '#1f2937' : '#111827';
+
+        if (!m.isAlive) {
+          bgColor = '#e5e7eb';
+          borderColor = '#9ca3af';
+          textColor = '#6b7280';
+        }
+
+        if (isMe) {
+          bgColor = '#d1d5db';
+          borderColor = '#171717';
+          textColor = '#0a0a0a';
+        }
+
+        let cleanName = m.name;
+        if (m.nickname && m.nickname !== m.name) {
+          cleanName += ` (${m.nickname})`;
+        }
+
+        let labelText = cleanName;
+        if (isMe) {
+          labelText += "\n[ SAYA ]";
+        }
+        if (!m.isAlive) {
+          labelText += "\n(Wafat)";
+        }
+
+        nodesArr.push({
+          id: m.id,
+          label: labelText,
+          color: {
+            background: bgColor,
+            border: borderColor,
+            highlight: { 
+              background: isMe ? '#9ca3af' : '#ffffff', 
+              border: '#000000' 
+            }
+          },
+          borderWidth: isMe ? 3 : 2,
+          font: { color: textColor, bold: isMe ? true : false },
+          opacity: m.isAlive ? 1 : 0.75
+        });
+
+        if (m.fatherId) {
+          edgesArr.push({
+            from: m.fatherId,
+            to: m.id,
+            arrows: 'to',
+            color: { color: '#171717' },
+            width: 2
+          });
+        }
+        if (m.motherId && m.motherId !== m.fatherId) {
+          edgesArr.push({
+            from: m.motherId,
+            to: m.id,
+            arrows: 'to',
+            color: { color: '#4b5563' },
+            width: 2
+          });
+        }
+
+        if (m.siblingOfId && !m.fatherId && !m.motherId) {
+          edgesArr.push({
+            from: m.siblingOfId,
+            to: m.id,
+            dashes: [2, 4],
+            color: { color: '#6b7280' },
+            width: 2,
+            title: m.siblingOrder || 'Saudara kandung'
+          });
+        }
+
+        if (m.spouseId) {
+          const pairKey = [m.id, m.spouseId].sort().join('_');
+          if (!marriageEdges.has(pairKey)) {
+            marriageEdges.add(pairKey);
+            edgesArr.push({
+              from: m.id,
+              to: m.spouseId,
+              dashes: [4, 4],
+              color: { color: '#4b5563' },
+              width: 2,
+              title: 'Pasangan Pernikahan'
+            });
+          }
+        }
+      });
+
+      visNodes.add(nodesArr);
+      visEdges.add(edgesArr);
+
+      setTimeout(() => { if (networkGraph) networkGraph.fit(); }, 200);
+    }
+
+    function renderCardsView() {
+      const container = document.getElementById('cards-view');
+      container.innerHTML = familyMembers.map(m => {
+        const isMe = m.id === meId;
+        const safePhoto = m.photoUrl || getDefaultAvatarSVG(m.gender);
+        const safeName = escapeHtml(m.name);
+        const safeJob = escapeHtml(m.job || 'Pekerjaan -');
+        return `
+          <div onclick="openDetailModal(${m.id})" class="bg-white rounded-2xl p-3 border ${isMe ? 'border-neutral-900 ring-2 ring-gray-300' : 'border-neutral-200'} shadow-sm hover:shadow transition cursor-pointer relative flex items-center gap-3">
+            ${isMe ? '<span class="absolute top-2.5 right-2.5 bg-gray-400 text-neutral-950 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full">[SAYA]</span>' : ''}
+            <img src="${safePhoto}" onerror="this.src=getDefaultAvatarSVG('${m.gender}')" class="w-11 h-11 rounded-xl bg-neutral-100 object-cover flex-shrink-0 border border-neutral-300">
+            <div class="min-w-0 flex-1">
+              <h4 class="font-bold text-xs text-neutral-800 truncate">${safeName}</h4>
+              <p class="text-[10px] text-neutral-500">${m.gender === 'L' ? 'Laki-Laki' : 'Perempuan'} ${!m.isAlive ? '(Wafat)' : ''}</p>
+              <p class="text-[10px] text-gray-700 font-semibold truncate">${safeJob}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function switchView(view) {
+      currentView = view;
+      const btnTree = document.getElementById('btnViewTree');
+      const btnNet = document.getElementById('btnViewNetwork');
+      const btnCards = document.getElementById('btnViewCards');
+      const cardsView = document.getElementById('cards-view');
+
+      [btnTree, btnNet, btnCards].forEach(b => {
+        b.className = "px-3 py-1 rounded-lg text-xs font-semibold text-neutral-600 transition hover:text-neutral-900";
+      });
+
+      if (view === 'cards') {
+        btnCards.className = "px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm bg-neutral-900 text-white";
+        cardsView.classList.remove('hidden');
+      } else {
+        cardsView.classList.add('hidden');
+        if (view === 'tree') {
+          btnTree.className = "px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm bg-neutral-900 text-white";
+        } else {
+          btnNet.className = "px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm bg-neutral-900 text-white";
+        }
+
+        networkGraph.setOptions({
+          layout: { hierarchical: { enabled: view === 'tree' } },
+          physics: { 
+            enabled: true,
+            solver: view === 'tree' ? 'hierarchicalRepulsion' : 'forceAtlas2Based'
+          }
+        });
+        updateGraphData();
+      }
+    }
+
+    function zoomGraph(factor) {
+      if (networkGraph) {
+        const scale = networkGraph.getScale();
+        networkGraph.moveTo({ scale: scale + factor });
+      }
+    }
+
+    function fitGraph() {
+      if (networkGraph) networkGraph.fit();
+    }
+
+    function openAddMemberModal(targetId = meId, defaultRelation = 'child') {
+      if (!isEditMode) return;
+
+      const modal = document.getElementById('memberModal');
+      document.getElementById('memberForm').reset();
+      document.getElementById('formMemberId').value = "";
+      clearUploadedFormPhoto();
+      document.getElementById('memberModalTitle').innerHTML = `<i class="fa-solid fa-user-plus text-gray-400"></i> Tambah Kerabat Keluarga`;
+      document.getElementById('relationSelectGroup').classList.remove('hidden');
+
+      populateTargetMembers(targetId);
+      updateRelationOptions(defaultRelation);
+      toggleDeathDate();
+
+      modal.classList.remove('hidden');
+    }
+
+    function openEditMemberModal(id) {
+      if (!isEditMode) return;
+
+      const member = familyMembers.find(m => m.id === id);
+      if (!member) return;
+
+      const modal = document.getElementById('memberModal');
+      document.getElementById('memberForm').reset();
+      clearUploadedFormPhoto();
+      document.getElementById('formMemberId').value = member.id;
+      document.getElementById('memberModalTitle').innerHTML = `<i class="fa-solid fa-user-pen text-gray-400"></i> Edit Profil Anggota`;
+      document.getElementById('relationSelectGroup').classList.add('hidden');
+
+      document.getElementById('formFullName').value = member.name;
+      document.getElementById('formNickname').value = member.nickname || "";
+      document.getElementById('formGender').value = member.gender;
+      document.getElementById('formIsAlive').value = member.isAlive ? "true" : "false";
+      document.getElementById('formBirthDate').value = member.birthDate || "";
+      document.getElementById('formDeathDate').value = member.deathDate || "";
+      document.getElementById('formBirthPlace').value = member.birthPlace || "";
+      document.getElementById('formJob').value = member.job || "";
+      
+      if (member.photoUrl && member.photoUrl.startsWith('data:image')) {
+        document.getElementById('formPhotoData').value = member.photoUrl;
+        document.getElementById('formPhotoPreviewImg').src = member.photoUrl;
+        document.getElementById('formPhotoPreviewContainer').classList.remove('hidden');
+      } else {
+        document.getElementById('formPhotoUrl').value = member.photoUrl || "";
+      }
+
+      document.getElementById('formPhone').value = member.phone || "";
+      document.getElementById('formAddress').value = member.address || "";
+      document.getElementById('formNotes').value = member.notes || "";
+
+      toggleDeathDate();
+      closeDetailModal();
+      modal.classList.remove('hidden');
+    }
+
+    function openEditMeModal() {
+      openEditMemberModal(meId);
+    }
+
+    function closeMemberModal() {
+      document.getElementById('memberModal').classList.add('hidden');
+    }
+
+    function populateTargetMembers(selectedId) {
+      const select = document.getElementById('targetMemberId');
+      select.innerHTML = familyMembers.map(m => `
+        <option value="${m.id}" ${m.id === selectedId ? 'selected' : ''}>${escapeHtml(m.name)} (${m.id === meId ? 'SAYA' : m.gender})</option>
+      `).join('');
+    }
+
+    function updateRelationOptions(preset = null) {
+      const select = document.getElementById('relationType');
+      let options = [
+        { value: 'father', label: 'Ayah' },
+        { value: 'mother', label: 'Ibu' },
+        { value: 'spouse', label: 'Pasangan (Suami/Istri)' },
+        { value: 'child', label: 'Anak' },
+        { value: 'olderSibling', label: 'Kakak (lebih tua)' },
+        { value: 'youngerSibling', label: 'Adik (lebih muda)' },
+        { value: 'sibling', label: 'Saudara Kandung (urutan belum ditentukan)' }
+      ];
+
+      select.innerHTML = options.map(o => `
+        <option value="${o.value}" ${preset === o.value ? 'selected' : ''}>${o.label}</option>
+      `).join('');
+    }
+
+    function toggleDeathDate() {
+      const isAlive = document.getElementById('formIsAlive').value === "true";
+      const container = document.getElementById('deathDateContainer');
+      if (isAlive) {
+        container.classList.add('hidden');
+      } else {
+        container.classList.remove('hidden');
+      }
+    }
+
+    function saveMemberForm(e) {
+      e.preventDefault();
+
+      const editId = document.getElementById('formMemberId').value;
+      const fullName = document.getElementById('formFullName').value.trim();
+      const nickname = document.getElementById('formNickname').value.trim();
+      const gender = document.getElementById('formGender').value;
+      const isAlive = document.getElementById('formIsAlive').value === "true";
+      const birthDate = document.getElementById('formBirthDate').value;
+      const deathDate = isAlive ? "" : document.getElementById('formDeathDate').value;
+      const birthPlace = document.getElementById('formBirthPlace').value.trim();
+      const job = document.getElementById('formJob').value.trim();
+      
+      const uploadedDataPhoto = document.getElementById('formPhotoData').value;
+      const photoUrlInput = document.getElementById('formPhotoUrl').value.trim();
+      const finalPhoto = uploadedDataPhoto || photoUrlInput || getDefaultAvatarSVG(gender);
+
+      const phone = document.getElementById('formPhone').value.trim();
+      const address = document.getElementById('formAddress').value.trim();
+      const notes = document.getElementById('formNotes').value.trim();
+
+      if (editId) {
+        const id = parseInt(editId);
+        const index = familyMembers.findIndex(m => m.id === id);
+        if (index !== -1) {
+          familyMembers[index] = {
+            ...familyMembers[index],
+            name: fullName,
+            nickname: nickname,
+            gender: gender,
+            isAlive: isAlive,
+            birthDate: birthDate,
+            deathDate: deathDate,
+            birthPlace: birthPlace,
+            job: job,
+            photoUrl: finalPhoto,
+            phone: phone,
+            address: address,
+            notes: notes
+          };
+          showToast("Data profil berhasil diperbarui!");
+        }
+      } else {
+        const targetId = parseInt(document.getElementById('targetMemberId').value);
+        const relation = document.getElementById('relationType').value;
+        const target = familyMembers.find(m => m.id === targetId);
+
+        const newId = familyMembers.length > 0 ? Math.max(...familyMembers.map(m => m.id)) + 1 : 1;
+
+        const newMember = {
+          id: newId,
+          isMe: false,
+          name: fullName,
+          nickname: nickname,
+          gender: gender,
+          isAlive: isAlive,
+          birthDate: birthDate,
+          deathDate: deathDate,
+          birthPlace: birthPlace,
+          job: job,
+          photoUrl: finalPhoto,
+          phone: phone,
+          address: address,
+          notes: notes,
+          fatherId: null,
+          motherId: null,
+          spouseId: null,
+          childrenIds: [],
+          siblingOrder: null
+        };
+
+        if (relation === 'father') {
+          target.fatherId = newId;
+          newMember.childrenIds.push(target.id);
+        } else if (relation === 'mother') {
+          target.motherId = newId;
+          newMember.childrenIds.push(target.id);
+        } else if (relation === 'spouse') {
+          target.spouseId = newId;
+          newMember.spouseId = target.id;
+        } else if (relation === 'child') {
+          if (target.gender === 'L') newMember.fatherId = target.id;
+          if (target.gender === 'P') newMember.motherId = target.id;
+          if (target.spouseId) {
+            const spouse = familyMembers.find(m => m.id === target.spouseId);
+            if (spouse && spouse.gender === 'P') newMember.motherId = spouse.id;
+            if (spouse && spouse.gender === 'L') newMember.fatherId = spouse.id;
+            if (spouse && !spouse.childrenIds.includes(newId)) spouse.childrenIds.push(newId);
+          }
+          target.childrenIds.push(newId);
+        } else if (relation === 'sibling' || relation === 'olderSibling' || relation === 'youngerSibling') {
+          newMember.fatherId = target.fatherId || null;
+          newMember.motherId = target.motherId || null;
+          newMember.siblingOrder = relation === 'olderSibling' ? 'Kakak' :
+                                   relation === 'youngerSibling' ? 'Adik' : null;
+          newMember.siblingOfId = target.id;
+        }
+
+        familyMembers.push(newMember);
+        showToast("Anggota kerabat berhasil ditambahkan!");
+      }
+
+      saveData();
+      renderAll();
+      closeMemberModal();
+    }
+
+    function openDetailModal(id) {
+      const member = familyMembers.find(m => m.id === id);
+      if (!member) return;
+
+      const isMe = member.id === meId;
+      const modal = document.getElementById('detailModal');
+
+      document.getElementById('detailAvatar').src = member.photoUrl || getDefaultAvatarSVG(member.gender);
+      
+      const crown = document.getElementById('detailBadgeCrown');
+      if (isMe) crown.classList.remove('hidden'); else crown.classList.add('hidden');
+
+      document.getElementById('detailName').innerText = member.name + (member.nickname ? ` (${member.nickname})` : '');
+      document.getElementById('detailRelationBadge').innerText = isMe ? 'PUSAT SILSILAH (SAYA)' : (member.gender === 'L' ? 'Laki-Laki' : 'Perempuan');
+
+      document.getElementById('detailGender').innerText = member.gender === 'L' ? 'Laki-Laki' : 'Perempuan';
+      document.getElementById('detailStatus').innerText = member.isAlive ? 'Masih Hidup' : `Wafat ${member.deathDate ? '('+member.deathDate+')' : ''}`;
+
+      let birthStr = member.birthDate || '-';
+      if (member.birthPlace) birthStr = `${member.birthPlace}, ${birthStr}`;
+      document.getElementById('detailBirth').innerText = birthStr;
+
+      document.getElementById('detailJob').innerText = member.job || '-';
+      document.getElementById('detailPhone').innerText = member.phone || '-';
+      document.getElementById('detailAddress').innerText = member.address || '-';
+      document.getElementById('detailNotes').innerText = member.notes || 'Tidak ada catatan.';
+
+      const quickAddSection = document.getElementById('quickAddSection');
+      const detailModalActions = document.getElementById('detailModalActions');
+
+      if (!isEditMode) {
+        quickAddSection.classList.add('hidden');
+        detailModalActions.classList.add('hidden');
+      } else {
+        quickAddSection.classList.remove('hidden');
+        detailModalActions.classList.remove('hidden');
+
+        const quickAdd = document.getElementById('quickAddButtons');
+        quickAdd.innerHTML = `
+          <button onclick="closeDetailModal(); openAddMemberModal(${member.id}, 'child')" class="p-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-lg text-[10px] font-bold border border-neutral-300">
+            + Anak
+          </button>
+          <button onclick="closeDetailModal(); openAddMemberModal(${member.id}, 'spouse')" class="p-1.5 bg-gray-100 hover:bg-gray-200 text-neutral-900 rounded-lg text-[10px] font-bold border border-gray-300">
+            + Pasangan
+          </button>
+          <button onclick="closeDetailModal(); openAddMemberModal(${member.id}, 'father')" class="p-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-lg text-[10px] font-bold border border-neutral-300">
+            + Ayah
+          </button>
+          <button onclick="closeDetailModal(); openAddMemberModal(${member.id}, 'mother')" class="p-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-lg text-[10px] font-bold border border-neutral-300">
+            + Ibu
+          </button>
+          <button onclick="closeDetailModal(); openAddMemberModal(${member.id}, 'olderSibling')" class="p-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-lg text-[10px] font-bold border border-neutral-300">
+            + Kakak
+          </button>
+          <button onclick="closeDetailModal(); openAddMemberModal(${member.id}, 'youngerSibling')" class="p-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-lg text-[10px] font-bold border border-neutral-300">
+            + Adik
+          </button>
+        `;
+
+        document.getElementById('btnEditMember').onclick = function() {
+          openEditMemberModal(member.id);
+        };
+
+        const btnDelete = document.getElementById('btnDeleteMember');
+        if (isMe) {
+          btnDelete.classList.add('hidden');
+        } else {
+          btnDelete.classList.remove('hidden');
+          btnDelete.onclick = function() { promptDeleteMember(member.id); };
+        }
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+    }
+
+    function promptDeleteMember(id) {
+      if (!isEditMode) return;
+
+      if (id === meId) {
+        showToast("Profil SAYA tidak dapat dihapus! Gunakan Reset Data untuk mulai ulang.", "error");
+        return;
+      }
+
+      const member = familyMembers.find(m => m.id === id);
+      if (!member) return;
+
+      openConfirmModal(
+        "Hapus Anggota Keluarga",
+        `Apakah Anda yakin ingin menghapus "${member.name}" dari peta silsilah?`,
+        function() {
+          executeDeleteMember(id);
+        }
+      );
+    }
+
+    function executeDeleteMember(id) {
+      familyMembers = familyMembers.filter(m => m.id !== id);
+
+      familyMembers.forEach(m => {
+        if (m.fatherId === id) m.fatherId = null;
+        if (m.motherId === id) m.motherId = null;
+        if (m.spouseId === id) m.spouseId = null;
+        m.childrenIds = (m.childrenIds || []).filter(cId => cId !== id);
+      });
+
+      saveData();
+      renderAll();
+      closeDetailModal();
+      showToast("Anggota keluarga berhasil dihapus.");
+    }
+
+    function resetDataConfirmation() {
+      if (!isEditMode) return;
+
+      openConfirmModal(
+        "Reset Seluruh Data",
+        "Apakah Anda yakin ingin menghapus seluruh silsilah dan memulai kembali dari awal?",
+        function() {
+          localStorage.removeItem(STORAGE_KEY);
+          familyMembers = [];
+          meId = null;
+          location.reload();
+        }
+      );
+    }
+
+    // --- EXPORT NATIVE SVG (FIX BERDEMPETAN & MULTI-LINE TEXT) ---
+function exportSVG() {
+  showToast("Menyiapkan file Vektor SVG...");
+
+  if (!networkGraph || familyMembers.length === 0) {
+    showToast("Data silsilah kosong!", "error");
+    return;
+  }
+
+  const positions = networkGraph.getPositions();
+
+  // 1. Fungsi untuk memecah teks panjang menjadi beberapa baris (Text Wrapping)
+  function wrapText(text, maxCharsPerLine = 18) {
+    const words = text.split(' ');
+    const lines = [];
+    let currentLine = '';
+
+    words.forEach(word => {
+      if ((currentLine + ' ' + word).trim().length <= maxCharsPerLine) {
+        currentLine = (currentLine + ' ' + word).trim();
+      } else {
+        if (currentLine) lines.push(currentLine);
+        currentLine = word;
+      }
+    });
+    if (currentLine) lines.push(currentLine);
+    return lines;
+  }
+
+  // 2. Hitung dimensi dinamis tiap node
+  const nodeDimensions = {};
+
+  familyMembers.forEach(m => {
+    let displayName = m.name;
+    if (m.nickname && m.nickname !== m.name) {
+      displayName = `${m.name} (${m.nickname})`;
+    }
+
+    const lines = wrapText(displayName, 16);
+    const isMe = m.id === meId;
+    const hasSubtitle = isMe || !m.isAlive;
+
+    // Hitung lebar & tinggi berdasarkan jumlah baris teks
+    const maxLineLen = Math.max(...lines.map(l => l.length));
+    const boxWidth = Math.max(140, maxLineLen * 8.5 + 24);
+    const lineHeight = 14;
+    const boxHeight = Math.max(54, lines.length * lineHeight + (hasSubtitle ? 24 : 16));
+
+    nodeDimensions[m.id] = {
+      width: boxWidth,
+      height: boxHeight,
+      lines: lines,
+      hasSubtitle: hasSubtitle
+    };
+  });
+
+  // 3. Hitung area kanvas SVG (Bounding Box dengan Margin Aman)
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+
+  familyMembers.forEach(m => {
+    const pos = positions[m.id];
+    const dim = nodeDimensions[m.id] || { width: 140, height: 54 };
+    if (pos) {
+      const halfW = dim.width / 2;
+      const halfH = dim.height / 2;
+      if (pos.x - halfW < minX) minX = pos.x - halfW;
+      if (pos.x + halfW > maxX) maxX = pos.x + halfW;
+      if (pos.y - halfH < minY) minY = pos.y - halfH;
+      if (pos.y + halfH > maxY) maxY = pos.y + halfH;
+    }
+  });
+
+  const margin = 120;
+  minX -= margin;
+  minY -= margin;
+  maxX += margin;
+  maxY += margin;
+
+  const svgWidth = maxX - minX;
+  const svgHeight = maxY - minY;
+
+  // 4. Header SVG
+  let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${minX} ${minY} ${svgWidth} ${svgHeight}" width="${svgWidth}" height="${svgHeight}" style="background-color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif;">\n`;
+
+  const marriageEdges = new Set();
+
+  // 5. Render Garis Relasi (Edges)
+  familyMembers.forEach(m => {
+    const posM = positions[m.id];
+    const dimM = nodeDimensions[m.id];
+    if (!posM || !dimM) return;
+
+    // Garis Ayah -> Anak
+    if (m.fatherId && positions[m.fatherId]) {
+      const posP = positions[m.fatherId];
+      const dimP = nodeDimensions[m.fatherId];
+      svgContent += `<line x1="${posP.x}" y1="${posP.y + dimP.height / 2}" x2="${posM.x}" y2="${posM.y - dimM.height / 2}" stroke="#171717" stroke-width="2" />\n`;
+    }
+
+    // Garis Ibu -> Anak
+    if (m.motherId && m.motherId !== m.fatherId && positions[m.motherId]) {
+      const posP = positions[m.motherId];
+      const dimP = nodeDimensions[m.motherId];
+      svgContent += `<line x1="${posP.x}" y1="${posP.y + dimP.height / 2}" x2="${posM.x}" y2="${posM.y - dimM.height / 2}" stroke="#4b5563" stroke-width="2" />\n`;
+    }
+
+    // Garis Pasangan (Pernikahan)
+    if (m.spouseId && positions[m.spouseId]) {
+      const pairKey = [m.id, m.spouseId].sort().join('_');
+      if (!marriageEdges.has(pairKey)) {
+        marriageEdges.add(pairKey);
+        const posS = positions[m.spouseId];
+        svgContent += `<line x1="${posM.x}" y1="${posM.y}" x2="${posS.x}" y2="${posS.y}" stroke="#4b5563" stroke-width="2" stroke-dasharray="5,5" />\n`;
+      }
+    }
+  });
+
+  // 6. Render Kotak Anggota & Teks Bertingkat (Nodes)
+  familyMembers.forEach(m => {
+    const pos = positions[m.id];
+    const dim = nodeDimensions[m.id];
+    if (!pos || !dim) return;
+
+    const isMe = m.id === meId;
+    const isMale = m.gender === 'L';
+
+    let bgColor = isMale ? '#f3f4f6' : '#f9fafb';
+    let borderColor = isMale ? '#374151' : '#4b5563';
+    let textColor = isMale ? '#1f2937' : '#111827';
+
+    if (!m.isAlive) {
+      bgColor = '#e5e7eb';
+      borderColor = '#9ca3af';
+      textColor = '#6b7280';
+    }
+
+    if (isMe) {
+      bgColor = '#d1d5db';
+      borderColor = '#171717';
+      textColor = '#0a0a0a';
+    }
+
+    const rectX = pos.x - dim.width / 2;
+    const rectY = pos.y - dim.height / 2;
+
+    // Render Background Box
+    svgContent += `<rect x="${rectX}" y="${rectY}" width="${dim.width}" height="${dim.height}" rx="12" fill="${bgColor}" stroke="${borderColor}" stroke-width="${isMe ? 3 : 2}" />\n`;
+
+    // Render Teks Nama (Multi-line)
+    const lineHeight = 14;
+    const totalTextHeight = dim.lines.length * lineHeight;
+    let startY = pos.y - totalTextHeight / 2 + lineHeight / 2;
+
+    if (dim.hasSubtitle) {
+      startY -= 6;
+    }
+
+    dim.lines.forEach((line, index) => {
+      const currentY = startY + index * lineHeight;
+      svgContent += `<text x="${pos.x}" y="${currentY}" font-size="12" font-weight="${isMe ? 'bold' : '600'}" fill="${textColor}" text-anchor="middle" dominant-baseline="central">${escapeHtml(line)}</text>\n`;
+    });
+
+    // Render Subtitle ([SAYA] / Wafat)
+    const subtitleY = pos.y + totalTextHeight / 2 + 4;
+    if (isMe) {
+      svgContent += `<text x="${pos.x}" y="${subtitleY}" font-size="10" font-weight="bold" fill="#000000" text-anchor="middle" dominant-baseline="central">[ SAYA ]</text>\n`;
+    } else if (!m.isAlive) {
+      svgContent += `<text x="${pos.x}" y="${subtitleY}" font-size="10" fill="#6b7280" text-anchor="middle" dominant-baseline="central">(Wafat)</text>\n`;
+    }
+  });
+
+  svgContent += `</svg>`;
+
+  // 7. Unduh SVG
+  const blob = new Blob([svgContent], { type: "image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `silsilah_keluarga_VEKTOR_${new Date().toISOString().slice(0,10)}.svg`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  showToast("File Vektor SVG rapi dan siap cetak!");
+}
+
+
+
+    // --- EXPORT & IMPORT UTILITIES ---
+    function exportJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ meId, members: familyMembers }, null, 2));
+      const anchor = document.createElement('a');
+      anchor.setAttribute("href", dataStr);
+      anchor.setAttribute("download", `silsilah_keluarga_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      showToast("Data JSON berhasil diekspor!");
+    }
+
+    function importJSON(event) {
+      if (!isEditMode) return;
+
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed.members && Array.isArray(parsed.members)) {
+            familyMembers = parsed.members;
+            meId = parsed.meId || 1;
+            saveData();
+            renderAll();
+            showToast("Data silsilah berhasil diimpor!");
+          } else {
+            showToast("Format JSON tidak valid!", "error");
+          }
+        } catch(err) {
+          showToast("Gagal membaca file JSON!", "error");
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = "";
+    }
+
+    function showToast(msg, type = "success") {
+      const toast = document.getElementById('toast');
+      const msgEl = document.getElementById('toastMessage');
+      const iconEl = document.getElementById('toastIcon');
+
+      msgEl.innerText = msg;
+      if (type === "error") {
+        iconEl.className = "fa-solid fa-circle-exclamation text-gray-300 text-sm";
+      } else {
+        iconEl.className = "fa-solid fa-circle-check text-gray-400 text-sm";
+      }
+
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
