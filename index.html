@@ -3,173 +3,149 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Peta Silsilah Keluarga</title>
-  
-  <!-- Tailwind CSS -->
+  <title>Peta Silsilah Keluarga & Kalkulator Panggilan (Indonesia & Aceh)</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              50: '#f9fafb',
-              100: '#f3f4f6',
-              200: '#e5e7eb',
-              300: '#d1d5db',
-              400: '#9ca3af',
-              500: '#6b7280',
-              600: '#4b5563',
-              700: '#374151',
-              800: '#1f2937',
-              900: '#111827',
-            }
-          }
-        }
-      }
-    }
-  </script>
-
-  <!-- Vis.js Network -->
-  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
-
-  <!-- FontAwesome Icons -->
+  <script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-    
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
-
     #tree-canvas {
       width: 100%;
       height: 100%;
-      min-height: 480px;
+      min-height: 520px;
       background-size: 20px 20px;
-      background-image: radial-gradient(circle, #e5e7eb 1px, transparent 1px);
+      background-image: radial-gradient(circle, #e5e5e5 1px, transparent 1px);
     }
-
-    ::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
-    }
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #9ca3af;
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #6b7280;
-    }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #a3a3a3; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #737373; }
   </style>
 </head>
-<body class="h-full flex flex-col text-neutral-800 bg-neutral-100 antialiased selection:bg-gray-400 selection:text-black">
+<body class="h-full flex flex-col text-neutral-800 bg-neutral-100 antialiased selection:bg-neutral-400 selection:text-black">
 
   <header class="bg-neutral-900 border-b border-neutral-800 text-white sticky top-0 z-30 shadow-md">
-  <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-    
-    <!-- App Brand -->
-    <div class="flex items-center space-x-2.5">
-      <div class="w-9 h-9 rounded-xl bg-gray-400 text-neutral-950 flex items-center justify-center font-bold shadow-md">
-        <i class="fa-solid fa-sitemap text-lg"></i>
+    <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+
+      <div class="flex items-center space-x-2.5">
+        <div class="w-9 h-9 rounded-xl bg-neutral-300 text-neutral-950 flex items-center justify-center font-bold shadow-md">
+          <i class="fa-solid fa-sitemap text-lg"></i>
+        </div>
+        <div>
+          <h1 class="text-sm font-bold text-white leading-tight flex items-center gap-1.5">
+            Silsilah Keluarga
+            <span class="text-[10px] bg-neutral-300 text-neutral-950 px-2 py-0.5 rounded-md font-bold">Pusat SAYA</span>
+          </h1>
+          <p class="text-[11px] text-neutral-400 font-medium">Sistem Pemetaan Keluarga &amp; Kalkulator Panggilan Cepat (Indonesia &amp; Aceh)</p>
+        </div>
       </div>
-      <div>
-        <h1 class="text-sm font-bold text-white leading-tight flex items-center gap-1.5">
-          Silsilah Keluarga
-          <span class="text-[10px] bg-gray-400 text-neutral-950 px-2 py-0.5 rounded-md font-bold">Pusat SAYA</span>
-        </h1>
-        <p class="text-[11px] text-neutral-400 font-medium">Sistem Pemetaan Keluarga</p>
+
+      <div class="flex items-center gap-1.5 flex-wrap w-full sm:w-auto justify-start">
+
+        <div class="bg-neutral-800 p-1 rounded-xl flex items-center border border-neutral-700">
+          <button id="btnTabSilsilah" onclick="switchMainTab('silsilah')" class="px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-neutral-300 text-neutral-950">
+            <i class="fa-solid fa-sitemap"></i>
+            <span>Peta Silsilah</span>
+          </button>
+          <button id="btnTabKalkulator" onclick="switchMainTab('kalkulator')" class="px-3 py-1 rounded-lg text-xs font-semibold text-neutral-400 hover:text-white transition flex items-center gap-1">
+            <i class="fa-solid fa-calculator"></i>
+            <span>Cek Panggilan</span>
+          </button>
+        </div>
+
+        <div id="silsilahControls" class="flex items-center gap-1.5">
+          <div class="h-5 w-px bg-neutral-700 mx-0.5"></div>
+
+          <div class="bg-neutral-800 p-1 rounded-xl flex items-center border border-neutral-700">
+            <button id="btnModeEdit" onclick="setEditMode(true)" class="px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-neutral-300 text-neutral-950">
+              <i class="fa-solid fa-pen-to-square"></i>
+              <span class="hidden sm:inline">Edit</span>
+            </button>
+            <button id="btnModeView" onclick="setEditMode(false)" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-neutral-400 hover:text-white transition flex items-center gap-1">
+              <i class="fa-solid fa-eye"></i>
+              <span class="hidden sm:inline">Lihat Saja</span>
+            </button>
+          </div>
+
+          <button id="btnConnectManual" onclick="toggleConnectMode()" class="bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-xs font-bold px-2.5 py-2 rounded-xl transition flex items-center gap-1.5" title="Hubungkan dua anggota secara manual">
+            <i class="fa-solid fa-diagram-next text-neutral-300"></i>
+            <span class="hidden sm:inline">Hubungkan Tali</span>
+          </button>
+
+          <button id="btnDeleteEdge" onclick="toggleDeleteEdgeMode()" class="bg-neutral-800 hover:bg-neutral-700 text-neutral-200 border border-neutral-700 text-xs font-bold px-2.5 py-2 rounded-xl transition flex items-center gap-1.5" title="Hapus garis relasi">
+            <i class="fa-solid fa-link-slash text-neutral-300"></i>
+            <span class="hidden sm:inline">Hapus Tali</span>
+          </button>
+
+          <button id="btnHeaderAddMember" onclick="openAddMemberModal()" class="bg-neutral-300 hover:bg-white text-neutral-950 text-xs font-bold px-3 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5 active:scale-95">
+            <i class="fa-solid fa-user-plus text-xs"></i>
+            <span class="hidden sm:inline">Tambah Kerabat</span>
+          </button>
+
+          <button onclick="exportJSON()" class="p-2 sm:px-2.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-xl text-xs font-medium transition" title="Ekspor data JSON">
+            <i class="fa-solid fa-download"></i>
+            <span class="hidden md:inline ml-1">JSON</span>
+          </button>
+
+          <label id="lblHeaderImport" class="p-2 sm:px-2.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-xl text-xs font-medium transition cursor-pointer" title="Impor data JSON">
+            <i class="fa-solid fa-upload"></i>
+            <span class="hidden md:inline ml-1">Impor</span>
+            <input type="file" id="importJsonInput" accept=".json,application/json" class="hidden" onchange="importJSON(event)">
+          </label>
+
+          <button onclick="exportSVG()" class="p-2 sm:px-2.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-xl text-xs font-bold transition border border-neutral-600" title="Cetak vektor SVG tajam">
+            <i class="fa-solid fa-vector-square"></i>
+            <span class="hidden md:inline ml-1">Cetak SVG</span>
+          </button>
+
+          <button id="btnHeaderReset" onclick="resetDataConfirmation()" class="p-2 text-neutral-400 hover:bg-neutral-800 hover:text-white rounded-xl text-xs transition" title="Reset data">
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>
+        </div>
+
       </div>
     </div>
+  </header>
 
-    <!-- Mode Switcher & Action Buttons Header (ml-auto dihapus) -->
-    <div class="flex items-center gap-1.5 flex-wrap w-full sm:w-auto justify-start">
-      
-      <!-- Mode Toggle Switch -->
-      <div class="bg-neutral-800 p-1 rounded-xl flex items-center border border-neutral-700">
-        <button id="btnModeEdit" onclick="setEditMode(true)" class="px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gray-400 text-neutral-950">
-          <i class="fa-solid fa-pen-to-square"></i>
-          <span class="hidden sm:inline">Edit</span>
-        </button>
-        <button id="btnModeView" onclick="setEditMode(false)" class="px-2.5 py-1 rounded-lg text-xs font-semibold text-neutral-400 hover:text-white transition flex items-center gap-1">
-          <i class="fa-solid fa-eye"></i>
-          <span class="hidden sm:inline">Lihat Saja</span>
-        </button>
-      </div>
+  <!-- TAB 1: BAGAN SILSILAH KELUARGA -->
+  <main id="mainSilsilahView" class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
 
-      <div class="h-5 w-px bg-neutral-800 mx-0.5"></div>
-
-      <!-- Action Buttons -->
-      <button id="btnHeaderAddMember" onclick="openAddMemberModal()" class="bg-gray-400 hover:bg-gray-300 text-neutral-950 text-xs font-bold px-3 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5 active:scale-95">
-        <i class="fa-solid fa-user-plus text-xs"></i>
-        <span class="hidden sm:inline">Tambah Kerabat</span>
-      </button>
-
-      <button onclick="exportJSON()" class="p-2 sm:px-2.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-xl text-xs font-medium transition" title="Ekspor Data JSON">
-        <i class="fa-solid fa-download"></i>
-        <span class="hidden md:inline ml-1">JSON</span>
-      </button>
-
-      <label id="lblHeaderImport" class="p-2 sm:px-2.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 rounded-xl text-xs font-medium transition cursor-pointer" title="Impor Data JSON">
-        <i class="fa-solid fa-upload"></i>
-        <span class="hidden md:inline ml-1">Impor</span>
-        <input type="file" id="importJsonInput" accept=".json" class="hidden" onchange="importJSON(event)">
-      </label>
-
-      <!-- SVG Export Button -->
-      <button onclick="exportSVG()" class="p-2 sm:px-2.5 bg-neutral-800 hover:bg-neutral-700 text-yellow-400 rounded-xl text-xs font-bold transition border border-yellow-500/30" title="Cetak Vektor SVG">
-        <i class="fa-solid fa-vector-square"></i>
-        <span class="hidden md:inline ml-1">Cetak SVG (Spanduk)</span>
-      </button>
-
-      <button id="btnHeaderReset" onclick="resetDataConfirmation()" class="p-2 text-neutral-400 hover:bg-neutral-800 hover:text-white rounded-xl text-xs transition" title="Reset Data">
-        <i class="fa-solid fa-rotate-left"></i>
-      </button>
-    </div>
-
-  </div>
-</header>
-
-  <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
-
-    <!-- Left Control Panel (4 Cols) -->
     <section class="lg:col-span-4 flex flex-col gap-3.5">
 
-      <!-- Center User "SAYA" Profile Card -->
-      <div id="meCard" class="bg-neutral-900 text-white rounded-2xl p-4 shadow-sm border-2 border-gray-400 relative overflow-hidden">
+      <div id="meCard" class="bg-neutral-900 text-white rounded-2xl p-4 shadow-sm border-2 border-neutral-400 relative overflow-hidden">
         <div class="flex items-center gap-3.5 relative z-10">
           <div class="relative">
-            <img id="meAvatar" src="" onerror="this.src=getDefaultAvatarSVG('L')" class="w-14 h-14 rounded-2xl bg-white p-1 object-cover shadow-sm border border-neutral-700">
-            <span class="absolute -top-1.5 -right-1.5 bg-gray-400 text-neutral-950 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shadow-sm">
+            <img id="meAvatar" src="" alt="Foto profil saya" onerror="this.onerror=null;this.src=getDefaultAvatarSVG('L')" class="w-14 h-14 rounded-2xl bg-white p-1 object-cover shadow-sm border border-neutral-700">
+            <span class="absolute -top-1.5 -right-1.5 bg-neutral-300 text-neutral-950 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shadow-sm">
               <i class="fa-solid fa-star"></i>
             </span>
           </div>
           <div class="flex-1 min-w-0">
-            <span class="text-[10px] font-bold uppercase tracking-wider bg-gray-400 text-neutral-950 px-2 py-0.5 rounded-md">PUSAT SILSILAH (SAYA)</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider bg-neutral-300 text-neutral-950 px-2 py-0.5 rounded-md">PUSAT SILSILAH (SAYA)</span>
             <h2 id="meName" class="text-sm font-bold truncate mt-1 text-white">Memuat data...</h2>
             <p id="meDetails" class="text-xs text-neutral-400 truncate"></p>
           </div>
-          <button id="btnEditMe" onclick="openEditMeModal()" class="bg-neutral-800 hover:bg-neutral-700 text-gray-400 border border-neutral-700 p-2 rounded-xl text-xs transition flex-shrink-0" title="Edit Profil Saya">
+          <button id="btnEditMe" onclick="openEditMeModal()" class="bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border border-neutral-700 p-2 rounded-xl text-xs transition flex-shrink-0" title="Edit profil saya">
             <i class="fa-solid fa-pen-to-square"></i>
           </button>
         </div>
       </div>
 
-      <!-- Quick Statistics Panel -->
       <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-neutral-200">
         <div class="flex items-center justify-between mb-2.5">
           <span class="text-[11px] font-bold text-neutral-500 uppercase tracking-wider flex items-center gap-1.5">
-            <i class="fa-solid fa-chart-pie text-gray-600"></i> Statistik Silsilah
+            <i class="fa-solid fa-chart-pie text-neutral-600"></i> Statistik Silsilah
           </span>
-          <span id="statTotalGenerations" class="text-xs font-bold text-neutral-900 bg-gray-100 px-2 py-0.5 rounded-lg border border-gray-300">0 Generasi</span>
+          <span id="statTotalGenerations" class="text-xs font-bold text-neutral-900 bg-neutral-100 px-2 py-0.5 rounded-lg border border-neutral-300">0 Generasi</span>
         </div>
         <div class="grid grid-cols-4 gap-2 text-center">
           <div class="bg-neutral-50 p-2 rounded-xl border border-neutral-200">
@@ -184,19 +160,18 @@
             <div id="statFemale" class="text-base font-bold text-neutral-800">0</div>
             <div class="text-[10px] text-neutral-500 font-medium">Wanita</div>
           </div>
-          <div class="bg-gray-50 p-2 rounded-xl border border-gray-200">
-            <div id="statAlive" class="text-base font-bold text-gray-700">0</div>
-            <div class="text-[10px] text-gray-800 font-medium">Hidup</div>
+          <div class="bg-neutral-100 p-2 rounded-xl border border-neutral-300">
+            <div id="statAlive" class="text-base font-bold text-neutral-900">0</div>
+            <div class="text-[10px] text-neutral-700 font-medium">Hidup</div>
           </div>
         </div>
       </div>
 
-      <!-- Member Search & List -->
       <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-neutral-200 flex-1 flex flex-col min-h-[260px]">
         <div class="space-y-2 mb-2.5">
           <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-neutral-400 text-xs"></i>
-            <input type="text" id="searchInput" oninput="renderMemberList()" placeholder="Cari nama anggota..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-neutral-50 border border-neutral-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-gray-400 outline-none transition">
+            <input type="text" id="searchInput" oninput="renderMemberList()" placeholder="Cari nama anggota..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-neutral-50 border border-neutral-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-neutral-400 outline-none transition">
           </div>
           <div class="grid grid-cols-2 gap-2">
             <select id="filterGender" onchange="renderMemberList()" class="text-xs bg-neutral-50 border border-neutral-300 rounded-xl p-1.5 outline-none font-medium text-neutral-700">
@@ -211,40 +186,39 @@
             </select>
           </div>
         </div>
-
-        <!-- Scrollable List -->
-        <div class="flex-1 overflow-y-auto pr-1 space-y-1.5 max-h-[220px]" id="memberListContainer">
-          <!-- Dynamically populated -->
-        </div>
+        <div class="flex-1 overflow-y-auto pr-1 space-y-1.5 max-h-[220px]" id="memberListContainer"></div>
       </div>
 
-      <!-- Legend Panel -->
       <div class="bg-white rounded-2xl p-3 shadow-sm border border-neutral-200 text-xs text-neutral-700">
-        <h4 class="font-bold text-neutral-400 text-[10px] uppercase tracking-wider mb-2">Keterangan Garis & Warna</h4>
+        <h4 class="font-bold text-neutral-400 text-[10px] uppercase tracking-wider mb-2">Keterangan Garis &amp; Warna</h4>
         <div class="grid grid-cols-2 gap-y-1.5 gap-x-2 text-[11px]">
           <div class="flex items-center gap-1.5">
-            <span class="w-3 h-3 rounded-md bg-gray-300 border border-neutral-900 inline-block"></span>
+            <span class="w-3 h-3 rounded-md bg-neutral-900 border border-black inline-block"></span>
             <span class="font-bold text-neutral-900">Pusat (SAYA)</span>
           </div>
           <div class="flex items-center gap-1.5">
-            <span class="w-3 h-3 rounded-md bg-neutral-100 border border-neutral-600 inline-block"></span>
+            <span class="w-3 h-3 rounded-md bg-white border-2 border-neutral-800 inline-block"></span>
             <span>Laki-Laki</span>
           </div>
           <div class="flex items-center gap-1.5">
-            <span class="w-3 h-3 rounded-md bg-gray-50 border border-gray-500 inline-block"></span>
+            <span class="w-3 h-3 rounded-md bg-neutral-200 border-2 border-neutral-600 inline-block"></span>
             <span>Perempuan</span>
           </div>
           <div class="flex items-center gap-1.5">
-            <span class="w-3 h-3 rounded-md bg-neutral-200 border border-neutral-400 inline-block"></span>
+            <span class="w-3 h-3 rounded-md bg-neutral-50 border-2 border-dashed border-neutral-400 inline-block"></span>
             <span>Wafat</span>
           </div>
           <div class="flex items-center gap-1.5 col-span-2">
             <span class="w-4 h-0.5 bg-neutral-900 inline-block"></span>
-            <span>Garis Keturunan (Anak)</span>
+            <span>Garis keturunan (Orang Tua &rarr; Anak)</span>
           </div>
           <div class="flex items-center gap-1.5 col-span-2">
-            <span class="w-4 h-0.5 border-t-2 border-dashed border-gray-600 inline-block"></span>
-            <span>Garis Pernikahan (Pasangan)</span>
+            <span class="w-4 h-0 border-t-2 border-dashed border-neutral-900 inline-block"></span>
+            <span class="font-bold text-neutral-900">Garis Pernikahan Aktif</span>
+          </div>
+          <div class="flex items-center gap-1.5 col-span-2">
+            <span class="w-4 h-0 border-t-2 border-dotted border-neutral-400 inline-block"></span>
+            <span>Garis Pernikahan Mantan (Bercerai)</span>
           </div>
         </div>
       </div>
@@ -252,8 +226,7 @@
     </section>
 
     <section class="lg:col-span-8 flex flex-col gap-3">
-      
-      <!-- View Control Switcher -->
+
       <div class="bg-white p-2 rounded-2xl shadow-sm border border-neutral-200 flex flex-wrap justify-between items-center gap-2">
         <div class="flex items-center bg-neutral-100 p-1 rounded-xl border border-neutral-200">
           <button id="btnViewTree" onclick="switchView('tree')" class="px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm bg-neutral-900 text-white">
@@ -268,32 +241,31 @@
         </div>
 
         <div id="graphZoomControls" class="flex items-center gap-1">
-          <button onclick="zoomGraph(0.2)" class="w-7 h-7 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 rounded-lg text-neutral-800 text-xs font-bold transition flex items-center justify-center">
+          <button onclick="zoomGraph(0.2)" aria-label="Perbesar" class="w-7 h-7 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 rounded-lg text-neutral-800 text-xs font-bold transition flex items-center justify-center">
             <i class="fa-solid fa-plus"></i>
           </button>
-          <button onclick="zoomGraph(-0.2)" class="w-7 h-7 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 rounded-lg text-neutral-800 text-xs font-bold transition flex items-center justify-center">
+          <button onclick="zoomGraph(-0.2)" aria-label="Perkecil" class="w-7 h-7 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 rounded-lg text-neutral-800 text-xs font-bold transition flex items-center justify-center">
             <i class="fa-solid fa-minus"></i>
           </button>
-          <button onclick="fitGraph()" class="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-neutral-900 border border-gray-300 rounded-lg text-xs font-bold transition">
+          <button onclick="fitGraph()" class="px-2.5 py-1 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 border border-neutral-300 rounded-lg text-xs font-bold transition">
             <i class="fa-solid fa-compress mr-1"></i> Reset View
           </button>
         </div>
       </div>
 
-      <!-- Main Canvas Container -->
       <div id="canvas-wrapper" class="bg-white rounded-2xl shadow-sm border border-neutral-200 flex-1 relative min-h-[500px] overflow-hidden flex flex-col">
-        
-        <!-- Vis.js Canvas -->
-        <div id="tree-canvas" class="flex-1"></div>
 
-        <!-- Cards View Grid -->
-        <div id="cards-view" class="hidden absolute inset-0 bg-neutral-50 p-4 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-          <!-- Dynamically populated -->
+        <div id="modeStatusBanner" class="hidden absolute top-3 left-3 right-3 bg-neutral-900 text-white px-4 py-2 rounded-xl text-xs font-bold z-20 flex items-center justify-between gap-2 shadow-lg border border-neutral-700">
+          <span id="modeStatusText"></span>
+          <button onclick="exitSpecialCanvasModes()" class="bg-neutral-800 hover:bg-neutral-700 text-white px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-neutral-600 flex-shrink-0">Batal / Selesai</button>
         </div>
 
-        <!-- Floating Hint -->
-        <div class="absolute bottom-3 left-3 bg-neutral-900/90 text-white backdrop-blur-md px-3 py-1.5 rounded-xl text-[11px] font-medium shadow-md pointer-events-none flex items-center gap-1.5">
-          <i class="fa-solid fa-hand-pointer text-gray-400"></i> Klik anggota di bagan untuk melihat detail.
+        <div id="tree-canvas" class="flex-1"></div>
+
+        <div id="cards-view" class="hidden absolute inset-0 bg-neutral-50 p-4 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 content-start"></div>
+
+        <div id="canvasHint" class="absolute bottom-3 left-3 bg-neutral-900/90 text-white backdrop-blur-md px-3 py-1.5 rounded-xl text-[11px] font-medium shadow-md pointer-events-none flex items-center gap-1.5">
+          <i class="fa-solid fa-hand-pointer text-neutral-300"></i> Klik anggota di bagan untuk melihat rincian silsilah lengkap.
         </div>
       </div>
 
@@ -301,10 +273,178 @@
 
   </main>
 
+  <!-- TAB 2: KALKULATOR PANGGULAN & SILSILAH OTOMATIS -->
+  <main id="mainKalkulatorView" class="hidden flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <section class="lg:col-span-5 bg-white border border-neutral-200 rounded-2xl p-5 shadow-sm space-y-4">
+      <div class="border-b border-neutral-200 pb-3 flex items-center justify-between">
+        <h2 class="text-sm font-bold text-neutral-900 flex items-center gap-2">
+          <i class="fa-solid fa-sliders text-neutral-700"></i> Hitung Hubungan Kerabat
+        </h2>
+        <span class="text-[11px] text-neutral-500 font-medium">Acuan: <b class="text-neutral-900">SAYA</b></span>
+      </div>
+
+      <form class="space-y-4 text-xs">
+        <div>
+          <label class="block font-bold text-neutral-700 uppercase mb-1">Metode Penelusuran</label>
+          <select id="calcModeType" onchange="toggleCalcModeUI()" class="w-full p-2.5 border border-neutral-300 rounded-xl outline-none font-semibold text-neutral-800 bg-neutral-50">
+            <option value="member_select" selected>Pilih Berdasarkan Nama Anggota (Cepat &amp; Otomatis)</option>
+            <option value="preset">Skenario Praktis (Sepupu, Paman, Bibi, dll)</option>
+            <option value="generation">Tingkat Generasi Langsung (Leluhur 1-18 / Keturunan 1-17)</option>
+          </select>
+        </div>
+
+        <!-- GRUP BARU: PILIH NAMA ANGGOTA DUA SISI -->
+        <div id="calcMemberGroup" class="space-y-3">
+          <div>
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Pilih Profil Utama (Saya)</label>
+            <select id="calcSourceMember" onchange="runKinshipCalc()" class="w-full p-2.5 border border-neutral-300 rounded-xl outline-none font-bold text-neutral-900 bg-white"></select>
+          </div>
+          <div>
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Pilih Nama Kerabat / Saudara</label>
+            <select id="calcTargetMember" onchange="runKinshipCalc()" class="w-full p-2.5 border border-neutral-300 rounded-xl outline-none font-bold text-neutral-900 bg-white"></select>
+          </div>
+        </div>
+
+        <div id="calcPresetGroup" class="hidden space-y-3">
+          <div>
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Pilih Skenario Kerabat</label>
+            <select id="calcPresetSelect" onchange="runKinshipCalc()" class="w-full p-2.5 border border-neutral-300 rounded-xl outline-none font-bold text-neutral-900 bg-white">
+              <optgroup label="Satu Generasi (Sejajar dengan Saya)">
+                <option value="sepupu1" selected>Anak dari Paman/Bibi (Sepupu Sekali)</option>
+                <option value="sepupu2_buyut">Anak dari Anak Buyut (Sepupu Dua Kali)</option>
+                <option value="sepupu3_canggah">Cucu dari Saudara Kakek/Nenek (Sepupu Tiga Kali)</option>
+              </optgroup>
+              <optgroup label="Generasi Atas (+1 / +2 Level)">
+                <option value="paman_bibi">Saudara Kandung Orang Tua (Paman / Bibi)</option>
+                <option value="paman_misan">Anak dari Saudara Kakek/Nenek (Paman/Bibi Sepupu)</option>
+                <option value="saudara_kakek">Saudara Kandung Kakek/Nenek (Kakek/Nenek Misan)</option>
+              </optgroup>
+              <optgroup label="Generasi Bawah (-1 / -2 Level)">
+                <option value="keponakan">Anak dari Saudara Kandung (Keponakan)</option>
+                <option value="cucu_keponakan">Anak dari Keponakan (Cucu Keponakan)</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+        <div id="calcGenGroup" class="hidden space-y-3">
+          <div>
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Pilih Tingkat Generasi</label>
+            <select id="calcGenLevel" onchange="runKinshipCalc()" class="w-full p-2.5 border border-neutral-300 rounded-xl outline-none font-bold text-neutral-900 bg-white">
+              <optgroup label="--- Garis Ke Atas (18 Generasi Leluhur) ---">
+                <option value="1">Generasi +1 : Orang Tua</option>
+                <option value="2">Generasi +2 : Kakek / Nenek</option>
+                <option value="3">Generasi +3 : Buyut / Uyut</option>
+                <option value="4">Generasi +4 : Canggah / Wa-Buyot</option>
+                <option value="5">Generasi +5 : Wareng / Nek-Tungkeet</option>
+                <option value="6">Generasi +6 : Udeg-udeg / Indatu-Jat</option>
+                <option value="7">Generasi +7 : Gantung Siwur / Indatu-Ala</option>
+                <option value="8">Generasi +8 : Kebok Tumpuk / Indatu-Sikok</option>
+                <option value="9">Generasi +9 : Debog Bosok / Indatu-Sestor</option>
+                <option value="10">Generasi +10 : Galih Asem / Indatu-Aksar</option>
+                <option value="11">Generasi +11 : Siwur / Indatu-Salap</option>
+                <option value="12">Generasi +12 : Isizer / Indatu-Pramu</option>
+                <option value="13">Generasi +13 : Giri / Indatu-Giri</option>
+                <option value="14">Generasi +14 : Gunung / Indatu-Wan</option>
+                <option value="15">Generasi +15 : Pramugari / Indatu-Majet</option>
+                <option value="16">Generasi +16 : Menya-menya / Indatu-Sultan</option>
+                <option value="17">Generasi +17 : Kabanda / Indatu-Moyang</option>
+                <option value="18">Generasi +18 : Trahing Kusuma / Indatu-Puncak</option>
+              </optgroup>
+              <optgroup label="--- Garis Ke Bawah (17 Generasi Keturunan) ---">
+                <option value="-1">Generasi -1 : Anak / Anek-Ibon</option>
+                <option value="-2">Generasi -2 : Cucu / Cucu-Hapet</option>
+                <option value="-3">Generasi -3 : Cicit / Cuci-Sik</option>
+                <option value="-4">Generasi -4 : Canggah / Piet-Siden</option>
+                <option value="-5">Generasi -5 : Wareng / Tungkeet</option>
+                <option value="-6">Generasi -6 : Udeg-Udeg / Cahee-Tungkeet</option>
+                <option value="-7">Generasi -7 : Gantung Siwur / Cahee-Cucu</option>
+                <option value="-8">Generasi -8 : Gropak Senthe / Cahee-Sunsi</option>
+                <option value="-9">Generasi -9 : Debog Bosok / Cahee-Walat</option>
+                <option value="-10">Generasi -10 : Galih Asem / Cahee-Siri</option>
+                <option value="-11">Generasi -11 : Gropak Watang / Cahee-Trah</option>
+                <option value="-12">Generasi -12 : Cendani / Cahee-Misan</option>
+                <option value="-13">Generasi -13 : Menya-menya / Cahee-Turunan</option>
+                <option value="-14">Generasi -14 : Menyaman / Cahee-Sula</option>
+                <option value="-15">Generasi -15 : Penitis / Cahee-Keturunan</option>
+                <option value="-16">Generasi -16 : Trah / Cahee-Ginerasi</option>
+                <option value="-17">Generasi -17 : Kasuran / Cahee-Ujong</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+
+        <div id="manualOptionsGroup" class="grid grid-cols-2 gap-2 pt-2 border-t border-neutral-200">
+          <div>
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Jenis Kelamin Kerabat</label>
+            <select id="calcGender" onchange="runKinshipCalc()" class="w-full p-2 border border-neutral-300 rounded-xl outline-none font-semibold text-neutral-800 bg-neutral-50">
+              <option value="L">Laki-Laki</option>
+              <option value="P">Perempuan</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-bold text-neutral-700 uppercase mb-1">Usia Relatif terhadap Saya</label>
+            <select id="calcAgeRel" onchange="runKinshipCalc()" class="w-full p-2 border border-neutral-300 rounded-xl outline-none font-semibold text-neutral-800 bg-neutral-50">
+              <option value="older">Lebih Tua dari Saya</option>
+              <option value="same">Sebaya / Seumuran</option>
+              <option value="younger">Lebih Muda dari Saya</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section class="lg:col-span-7 bg-white border border-neutral-200 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
+      <div>
+        <div class="border-b border-neutral-200 pb-3 flex items-center justify-between">
+          <h2 class="text-sm font-bold text-neutral-900 flex items-center gap-2">
+            <i class="fa-solid fa-address-card text-neutral-700"></i> Hasil Panggilan Otomatis
+          </h2>
+          <span class="text-[10px] bg-neutral-900 text-white font-extrabold px-2.5 py-0.5 rounded-md">
+            Rekomendasi Panggilan
+          </span>
+        </div>
+
+        <div class="mt-4 bg-neutral-900 text-white rounded-2xl p-6 text-center shadow-md relative overflow-hidden border-2 border-neutral-400">
+          <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1">Sebutan Panggilan Langsung</span>
+          <h3 id="resCalcCall" class="text-2xl sm:text-3xl font-extrabold text-white my-1">
+            Mas / Abang
+          </h3>
+          <p id="resCalcCallSub" class="text-xs text-neutral-400 italic">
+            "Sapaan sopan untuk kerabat yang usianya lebih tua"
+          </p>
+        </div>
+
+        <div class="mt-4 space-y-2 text-xs">
+          <div class="flex justify-between items-center p-2.5 bg-neutral-50 rounded-xl border border-neutral-200">
+            <span class="text-neutral-500 font-medium">Status Silsilah Indonesia:</span>
+            <span id="resCalcFormalIndo" class="font-bold text-neutral-900">Sepupu Sekali</span>
+          </div>
+          <div class="flex justify-between items-center p-2.5 bg-neutral-50 rounded-xl border border-neutral-200">
+            <span class="text-neutral-500 font-medium">Status Silsilah Lisan Aceh:</span>
+            <span id="resCalcFormalAceh" class="font-bold text-neutral-900">Syedara Sepupu Sekali</span>
+          </div>
+          <div class="flex justify-between items-center p-2.5 bg-neutral-50 rounded-xl border border-neutral-200">
+            <span class="text-neutral-500 font-medium">Tingkat Generasi:</span>
+            <span id="resCalcGenGap" class="font-bold text-neutral-900">Generasi Sejajar (0 Level)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 p-4 bg-neutral-50 border border-neutral-200 rounded-2xl text-xs space-y-1">
+        <span class="text-[10px] font-bold text-neutral-500 uppercase tracking-wider block">Alur &amp; Penjelasan Silsilah:</span>
+        <p id="resCalcDesc" class="text-neutral-700 leading-relaxed">
+          Pilih nama kerabat untuk menampilkan penjelasan jalur relasinya.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal profil awal -->
   <div id="initMeModal" class="fixed inset-0 bg-neutral-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
     <div class="bg-white rounded-3xl shadow-2xl border border-neutral-300 max-w-md w-full overflow-hidden my-8">
-      <div class="bg-neutral-900 p-6 text-white text-center relative border-b-4 border-gray-400">
-        <div class="w-14 h-14 bg-gray-400 text-neutral-950 rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-md mb-2">
+      <div class="bg-neutral-900 p-6 text-white text-center relative border-b-4 border-neutral-400">
+        <div class="w-14 h-14 bg-neutral-300 text-neutral-950 rounded-2xl flex items-center justify-center text-2xl mx-auto shadow-md mb-2">
           <i class="fa-solid fa-crown"></i>
         </div>
         <h3 class="text-lg font-bold text-white">Silsilah Keluarga Baru</h3>
@@ -314,16 +454,16 @@
       <form id="initMeForm" onsubmit="saveInitMe(event)" class="p-5 space-y-3.5 text-xs">
         <div>
           <label class="block font-bold text-neutral-700 uppercase mb-1">Nama Lengkap <span class="text-neutral-900">*</span></label>
-          <input type="text" id="initName" required placeholder="Contoh: Muhammad Khalil" class="w-full p-2.5 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-gray-400 outline-none">
+          <input type="text" id="initName" required placeholder="Contoh: Muhammad Khalil" class="w-full p-2.5 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-neutral-400 outline-none">
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-bold text-neutral-700 uppercase mb-1">Nama Panggilan</label>
-            <input type="text" id="initNickname" placeholder="Khalil" class="w-full p-2.5 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-gray-400 outline-none">
+            <input type="text" id="initNickname" placeholder="Khalil" class="w-full p-2.5 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-neutral-400 outline-none">
           </div>
           <div>
             <label class="block font-bold text-neutral-700 uppercase mb-1">Jenis Kelamin <span class="text-neutral-900">*</span></label>
-            <select id="initGender" required class="w-full p-2.5 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-gray-400 outline-none font-medium">
+            <select id="initGender" required class="w-full p-2.5 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-neutral-400 outline-none font-medium">
               <option value="L">Laki-Laki</option>
               <option value="P">Perempuan</option>
             </select>
@@ -332,25 +472,25 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-bold text-neutral-700 uppercase mb-1">Tanggal Lahir</label>
-            <input type="date" id="initBirthDate" class="w-full p-2.5 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-gray-400 outline-none">
+            <input type="date" id="initBirthDate" class="w-full p-2.5 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-neutral-400 outline-none">
           </div>
           <div>
             <label class="block font-bold text-neutral-700 uppercase mb-1">Pekerjaan</label>
-            <input type="text" id="initJob" placeholder="Pekerjaan / Profesi" class="w-full p-2.5 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-gray-400 outline-none">
+            <input type="text" id="initJob" placeholder="Pekerjaan / Profesi" class="w-full p-2.5 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-neutral-400 outline-none">
           </div>
         </div>
 
         <div>
           <label class="block font-bold text-neutral-700 uppercase mb-1">Upload Foto Profil (Lokal)</label>
-          <input type="file" id="initPhotoFile" accept="image/*" onchange="previewInitPhoto(this)" class="w-full text-xs p-1.5 border border-neutral-300 rounded-xl file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-neutral-900 file:text-white hover:file:bg-gray-500 hover:file:text-black">
+          <input type="file" id="initPhotoFile" accept="image/*" onchange="previewInitPhoto(this)" class="w-full text-xs p-1.5 border border-neutral-300 rounded-xl file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-neutral-900 file:text-white hover:file:bg-neutral-500 hover:file:text-black">
           <input type="hidden" id="initPhotoData">
           <div id="initPhotoPreviewBox" class="hidden mt-2 flex items-center gap-2 bg-neutral-50 p-2 rounded-xl border border-neutral-200">
-            <img id="initPhotoPreviewImg" src="" class="w-10 h-10 rounded-lg object-cover border border-neutral-300">
+            <img id="initPhotoPreviewImg" src="" alt="Pratinjau foto" class="w-10 h-10 rounded-lg object-cover border border-neutral-300">
             <span class="text-[11px] text-neutral-600 font-medium">Foto terpilih untuk profil</span>
           </div>
         </div>
 
-        <button type="submit" class="w-full py-3 bg-gray-400 hover:bg-gray-500 text-neutral-950 font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 mt-2">
+        <button type="submit" class="w-full py-3 bg-neutral-900 hover:bg-neutral-700 text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 mt-2">
           <span>Buat Peta Silsilah Saya</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
@@ -358,12 +498,13 @@
     </div>
   </div>
 
+  <!-- Modal tambah/edit anggota -->
   <div id="memberModal" class="fixed inset-0 bg-neutral-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
     <div class="bg-white rounded-3xl shadow-2xl border border-neutral-300 max-w-lg w-full overflow-hidden my-6">
-      
-      <div id="memberModalHeader" class="bg-neutral-900 p-4 text-white flex justify-between items-center border-b-2 border-gray-400">
+
+      <div class="bg-neutral-900 p-4 text-white flex justify-between items-center border-b-2 border-neutral-400">
         <h3 id="memberModalTitle" class="font-bold text-xs sm:text-sm flex items-center gap-2 text-white">
-          <i class="fa-solid fa-user-plus text-gray-400"></i> Tambah Kerabat Keluarga
+          <i class="fa-solid fa-user-plus text-neutral-300"></i> Tambah Kerabat Keluarga
         </h3>
         <button onclick="closeMemberModal()" class="text-neutral-400 hover:text-white text-lg">
           <i class="fa-solid fa-xmark"></i>
@@ -373,42 +514,83 @@
       <form id="memberForm" onsubmit="saveMemberForm(event)" class="p-5 space-y-3 max-h-[80vh] overflow-y-auto text-xs">
         <input type="hidden" id="formMemberId">
 
-        <div id="relationSelectGroup" class="bg-gray-50 p-3 rounded-2xl border border-gray-200">
-          <label class="block font-bold text-neutral-900 uppercase tracking-wider mb-1 text-[10px]">
-            <i class="fa-solid fa-link text-gray-600 mr-1"></i> Hubungan Terhadap:
-          </label>
-          <div class="grid grid-cols-2 gap-2">
-            <select id="targetMemberId" onchange="updateRelationOptions()" class="p-2 border border-neutral-300 rounded-xl outline-none font-semibold text-neutral-800 bg-white">
-            </select>
-            <select id="relationType" class="p-2 border border-neutral-300 rounded-xl outline-none font-bold text-neutral-900 bg-white">
-            </select>
+        <div id="relationSelectGroup" class="bg-neutral-50 p-3.5 rounded-2xl border border-neutral-200 space-y-2.5">
+          <div class="flex items-center justify-between gap-2">
+            <label class="block font-bold text-neutral-900 uppercase tracking-wider text-[10px]">
+              <i class="fa-solid fa-link text-neutral-600 mr-1"></i> Hubungkan relasi ke anggota lain
+            </label>
+            <button type="button" onclick="toggleMultiConnectMode()" id="btnToggleMultiMode" class="text-[10px] font-bold text-neutral-800 bg-neutral-200 hover:bg-neutral-300 px-2 py-0.5 rounded-lg transition border border-neutral-300 flex-shrink-0">
+              <i class="fa-solid fa-list-check mr-1"></i> Mode Pilih Banyak (Anak/Adik)
+            </button>
+          </div>
+
+          <div id="singleRelationBox" class="space-y-2">
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-neutral-400 text-xs"></i>
+              <input type="text" id="targetSearchInput" oninput="filterTargetMembers()" placeholder="Cari nama anggota target..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-neutral-400">
+            </div>
+            <p class="text-[10px] text-neutral-500 font-medium">Orang yang sedang diisi ini adalah <b>(pilih hubungan)</b> dari anggota target:</p>
+            <div class="grid grid-cols-2 gap-2">
+              <select id="targetMemberId" class="p-2 border border-neutral-300 rounded-xl outline-none font-semibold text-neutral-800 bg-white"></select>
+              <select id="relationType" onchange="toggleSpouseStatusOption()" class="p-2 border border-neutral-300 rounded-xl outline-none font-bold text-neutral-900 bg-white"></select>
+            </div>
+            
+            <div id="spouseStatusContainer" class="hidden bg-white p-2 rounded-xl border border-neutral-200 mt-1">
+              <label class="block font-bold text-neutral-700 text-[10px] uppercase mb-1">Status Pernikahan Dengan Anggota Target:</label>
+              <select id="spouseRelationStatus" class="w-full p-1.5 border border-neutral-300 rounded-lg outline-none font-medium bg-neutral-50">
+                <option value="active">Menikah (Aktif / Suami-Istri)</option>
+                <option value="divorced">Bercerai (Mantan Suami/Istri)</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="multiRelationBox" class="hidden space-y-2 border-t border-neutral-200 pt-2">
+            <div class="flex items-center justify-between bg-white p-2 rounded-xl border border-neutral-200 gap-2">
+              <select id="multiRelationType" class="p-1.5 border border-neutral-300 rounded-lg outline-none font-bold text-xs bg-neutral-50 text-neutral-900 min-w-0">
+                <option value="children">Anggota terpilih adalah ANAK dari profil ini</option>
+                <option value="siblings">Anggota terpilih adalah SAUDARA KANDUNG dari profil ini</option>
+              </select>
+              <button type="button" onclick="selectAllUnrelated()" class="text-[10px] font-bold text-neutral-900 underline hover:text-black flex-shrink-0">Pilih Semua Belum Berelasi</button>
+            </div>
+
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-neutral-400 text-xs"></i>
+              <input type="text" id="multiSearchInput" oninput="renderMultiPickList()" placeholder="Cari nama anggota untuk dicentang..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-neutral-400">
+            </div>
+
+            <div class="flex gap-2">
+              <button type="button" onclick="setMultiFilter('all')" id="btnFilterAll" class="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-neutral-800 text-white">Semua</button>
+              <button type="button" onclick="setMultiFilter('unrelated')" id="btnFilterUnrelated" class="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-neutral-200 text-neutral-800 hover:bg-neutral-300">Belum Punya Relasi</button>
+            </div>
+
+            <div id="multiPickListContainer" class="max-h-[160px] overflow-y-auto bg-white p-2 border border-neutral-300 rounded-xl space-y-1"></div>
           </div>
         </div>
 
         <div class="grid grid-cols-3 gap-2">
           <div class="col-span-2">
             <label class="block font-bold text-neutral-700 uppercase mb-1">Nama Lengkap <span class="text-neutral-900">*</span></label>
-            <input type="text" id="formFullName" required placeholder="Contoh: Budi Santoso" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-gray-400">
+            <input type="text" id="formFullName" required placeholder="Contoh: Budi Santoso" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-neutral-400">
           </div>
           <div>
             <label class="block font-bold text-neutral-700 uppercase mb-1">Panggilan</label>
-            <input type="text" id="formNickname" placeholder="Budi" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-gray-400">
+            <input type="text" id="formNickname" placeholder="Budi" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-neutral-400">
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-bold text-neutral-700 uppercase mb-1">Jenis Kelamin <span class="text-neutral-900">*</span></label>
-            <select id="formGender" required class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-gray-400 font-medium">
+            <select id="formGender" required class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-neutral-400 font-medium">
               <option value="L">Laki-Laki</option>
               <option value="P">Perempuan</option>
             </select>
           </div>
           <div>
             <label class="block font-bold text-neutral-700 uppercase mb-1">Status Kehidupan</label>
-            <select id="formIsAlive" onchange="toggleDeathDate()" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-gray-400 font-medium">
+            <select id="formIsAlive" onchange="toggleDeathDate()" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-neutral-400 font-medium">
               <option value="true">Masih Hidup</option>
-              <option value="false">Sudah Meninggal</option>
+              <option value="false">Sudah Wafat</option>
             </select>
           </div>
         </div>
@@ -416,36 +598,36 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-bold text-neutral-700 uppercase mb-1">Tanggal Lahir</label>
-            <input type="date" id="formBirthDate" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-gray-400">
+            <input type="date" id="formBirthDate" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-neutral-400">
           </div>
           <div id="deathDateContainer" class="hidden">
             <label class="block font-bold text-neutral-700 uppercase mb-1">Tanggal Wafat</label>
-            <input type="date" id="formDeathDate" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-gray-400">
+            <input type="date" id="formDeathDate" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-neutral-400">
           </div>
           <div id="birthPlaceContainer">
             <label class="block font-bold text-neutral-700 uppercase mb-1">Tempat Lahir</label>
-            <input type="text" id="formBirthPlace" placeholder="Jakarta" class="w-full p-2 border border-neutral-300 rounded-xl outline-none">
+            <input type="text" id="formBirthPlace" placeholder="Jakarta" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-neutral-400">
           </div>
         </div>
 
         <div class="bg-neutral-50 p-3 rounded-2xl border border-neutral-200 space-y-2">
           <label class="block font-bold text-neutral-800 uppercase tracking-wider text-[10px]">
-            <i class="fa-solid fa-image text-gray-600 mr-1"></i> Foto Anggota Keluarga
+            <i class="fa-solid fa-image text-neutral-600 mr-1"></i> Foto Anggota Keluarga
           </label>
           <div>
-            <span class="block text-[11px] text-neutral-500 font-semibold mb-1">Option A: Upload Foto dari Komputer/HP</span>
-            <input type="file" id="formPhotoFile" accept="image/*" onchange="previewFormPhoto(this)" class="w-full text-xs p-1 border border-neutral-300 rounded-xl file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-neutral-900 file:text-white hover:file:bg-gray-500 hover:file:text-black">
+            <span class="block text-[11px] text-neutral-500 font-semibold mb-1">Opsi A: Upload foto dari komputer/HP</span>
+            <input type="file" id="formPhotoFile" accept="image/*" onchange="previewFormPhoto(this)" class="w-full text-xs p-1 border border-neutral-300 rounded-xl file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-neutral-900 file:text-white hover:file:bg-neutral-500 hover:file:text-black">
           </div>
           <div id="formPhotoPreviewContainer" class="hidden flex items-center justify-between bg-white p-2 rounded-xl border border-neutral-200">
             <div class="flex items-center gap-2">
-              <img id="formPhotoPreviewImg" src="" class="w-10 h-10 rounded-lg object-cover border border-neutral-300">
-              <span class="text-[11px] text-neutral-700 font-medium">Foto Lokal Siap Disimpan</span>
+              <img id="formPhotoPreviewImg" src="" alt="Pratinjau foto" class="w-10 h-10 rounded-lg object-cover border border-neutral-300">
+              <span class="text-[11px] text-neutral-700 font-medium">Foto lokal siap disimpan</span>
             </div>
             <button type="button" onclick="clearUploadedFormPhoto()" class="text-neutral-900 hover:text-black text-xs px-2 py-1 font-bold">Hapus</button>
           </div>
           <input type="hidden" id="formPhotoData">
           <div>
-            <span class="block text-[11px] text-neutral-500 font-semibold mb-1">Option B: URL Gambar Web (Opsional)</span>
+            <span class="block text-[11px] text-neutral-500 font-semibold mb-1">Opsi B: URL gambar web (opsional)</span>
             <input type="url" id="formPhotoUrl" placeholder="https://..." class="w-full p-2 border border-neutral-300 rounded-xl outline-none">
           </div>
         </div>
@@ -453,27 +635,27 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block font-bold text-neutral-700 uppercase mb-1">Pekerjaan</label>
-            <input type="text" id="formJob" placeholder="Profesi / Pekerjaan" class="w-full p-2 border border-neutral-300 rounded-xl outline-none">
+            <input type="text" id="formJob" placeholder="Profesi / Pekerjaan" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-neutral-400">
           </div>
           <div>
             <label class="block font-bold text-neutral-700 uppercase mb-1">No. WhatsApp / HP</label>
-            <input type="text" id="formPhone" placeholder="0812..." class="w-full p-2 border border-neutral-300 rounded-xl outline-none">
+            <input type="text" id="formPhone" placeholder="0812..." inputmode="tel" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-neutral-400">
           </div>
         </div>
 
         <div>
           <label class="block font-bold text-neutral-700 uppercase mb-1">Kota / Alamat Singkat</label>
-          <input type="text" id="formAddress" placeholder="Bandung" class="w-full p-2 border border-neutral-300 rounded-xl outline-none">
+          <input type="text" id="formAddress" placeholder="Bandung" class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-neutral-400">
         </div>
 
         <div>
           <label class="block font-bold text-neutral-700 uppercase mb-1">Catatan Khusus</label>
-          <textarea id="formNotes" rows="2" placeholder="Catatan memori atau silsilah..." class="w-full p-2 border border-neutral-300 rounded-xl outline-none"></textarea>
+          <textarea id="formNotes" rows="2" placeholder="Catatan memori atau status riwayat keluarga..." class="w-full p-2 border border-neutral-300 rounded-xl outline-none focus:ring-2 focus:ring-neutral-400"></textarea>
         </div>
 
         <div class="flex justify-end gap-2 pt-2 border-t border-neutral-200">
           <button type="button" onclick="closeMemberModal()" class="px-3.5 py-1.5 border border-neutral-300 text-neutral-700 rounded-xl font-semibold hover:bg-neutral-100">Batal</button>
-          <button type="submit" class="px-4 py-1.5 bg-gray-400 hover:bg-gray-500 text-neutral-950 rounded-xl font-bold shadow-sm flex items-center gap-1.5">
+          <button type="submit" class="px-4 py-1.5 bg-neutral-900 hover:bg-neutral-700 text-white rounded-xl font-bold shadow-sm flex items-center gap-1.5">
             <i class="fa-solid fa-floppy-disk"></i> Simpan Data
           </button>
         </div>
@@ -481,29 +663,59 @@
     </div>
   </div>
 
+  <!-- Modal hubungan manual -->
+  <div id="edgeTypeModal" class="fixed inset-0 bg-neutral-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
+    <div class="bg-white rounded-3xl shadow-2xl border border-neutral-300 max-w-sm w-full p-5 text-xs space-y-4">
+      <div class="text-center">
+        <div class="w-10 h-10 bg-neutral-900 text-white rounded-xl flex items-center justify-center mx-auto mb-2 text-base">
+          <i class="fa-solid fa-diagram-project"></i>
+        </div>
+        <h3 class="font-bold text-neutral-900 text-sm">Pilih Jenis Hubungan Silsilah</h3>
+        <p class="text-neutral-500 text-[11px] mt-0.5" id="edgeTypeModalSub">Menghubungkan dua anggota keluarga secara manual</p>
+      </div>
+
+      <div>
+        <label class="block font-bold text-neutral-700 uppercase mb-1">Hubungan dari Anggota A ke B:</label>
+        <select id="edgeRelationSelect" class="w-full p-2.5 border border-neutral-300 rounded-xl outline-none font-bold bg-neutral-50">
+          <option value="parent">A adalah Orang Tua dari B</option>
+          <option value="child">A adalah Anak dari B</option>
+          <option value="spouse">A dan B Pasangan (Suami/Istri - Aktif)</option>
+          <option value="spouse_divorced">A dan B Mantan Pasangan (Bercerai)</option>
+          <option value="sibling">A dan B Saudara Kandung</option>
+        </select>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="closeEdgeTypeModal()" class="w-1/2 py-2 border border-neutral-300 rounded-xl font-semibold hover:bg-neutral-100">Batal</button>
+        <button onclick="confirmManualConnection()" class="w-1/2 py-2 bg-neutral-900 text-white font-bold rounded-xl shadow hover:bg-neutral-800">Hubungkan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal detail -->
   <div id="detailModal" class="fixed inset-0 bg-neutral-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
-    <div class="bg-white rounded-3xl shadow-2xl border border-neutral-300 max-w-md w-full overflow-hidden my-6">
-      
-      <div id="detailHeader" class="p-5 text-white bg-neutral-900 border-b-2 border-gray-400 relative">
+    <div class="bg-white rounded-3xl shadow-2xl border border-neutral-300 max-w-lg w-full overflow-hidden my-6">
+
+      <div class="p-5 text-white bg-neutral-900 border-b-2 border-neutral-400 relative">
         <button onclick="closeDetailModal()" class="absolute top-4 right-4 text-neutral-400 hover:text-white text-lg">
           <i class="fa-solid fa-xmark"></i>
         </button>
 
         <div class="flex items-center gap-3.5">
           <div class="relative">
-            <img id="detailAvatar" src="" onerror="this.src=getDefaultAvatarSVG('L')" class="w-14 h-14 rounded-2xl bg-white p-1 object-cover shadow-sm border border-neutral-700">
-            <span id="detailBadgeCrown" class="hidden absolute -top-1.5 -right-1.5 bg-gray-400 text-neutral-950 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shadow-sm">
+            <img id="detailAvatar" src="" alt="Foto anggota" onerror="this.onerror=null;this.src=getDefaultAvatarSVG('L')" class="w-14 h-14 rounded-2xl bg-white p-1 object-cover shadow-sm border border-neutral-700">
+            <span id="detailBadgeCrown" class="hidden absolute -top-1.5 -right-1.5 bg-neutral-300 text-neutral-950 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shadow-sm">
               <i class="fa-solid fa-star"></i>
             </span>
           </div>
-          <div>
-            <h3 id="detailName" class="text-base font-bold text-white">Nama Anggota</h3>
-            <span id="detailRelationBadge" class="inline-block mt-0.5 px-2 py-0.5 text-[10px] font-bold bg-gray-400 text-neutral-950 rounded-md">Relasi</span>
+          <div class="min-w-0 pr-6">
+            <h3 id="detailName" class="text-base font-bold text-white break-words">Nama Anggota</h3>
+            <span id="detailRelationBadge" class="inline-block mt-0.5 px-2 py-0.5 text-[10px] font-bold bg-neutral-300 text-neutral-950 rounded-md">Relasi</span>
           </div>
         </div>
       </div>
 
-      <div class="p-4 space-y-2.5 text-xs">
+      <div class="p-4 space-y-3 text-xs max-h-[75vh] overflow-y-auto">
         <div class="grid grid-cols-2 gap-2 pb-2 border-b border-neutral-100">
           <div>
             <span class="text-neutral-400 block text-[10px] uppercase font-bold">Gender</span>
@@ -538,71 +750,442 @@
         </div>
 
         <div class="pb-2 border-b border-neutral-100">
-          <span class="text-neutral-400 block text-[10px] uppercase font-bold">Catatan Memory</span>
+          <span class="text-neutral-400 block text-[10px] uppercase font-bold">Catatan Memori</span>
           <p id="detailNotes" class="text-neutral-600 italic mt-0.5">-</p>
+        </div>
+
+        <div class="bg-neutral-50 p-3 rounded-2xl border border-neutral-200 space-y-2">
+          <h4 class="font-bold text-neutral-900 text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-diagram-project text-neutral-700"></i> Silsilah Berantai Lintas Generasi
+          </h4>
+          <div id="genealogyChainBox" class="space-y-1.5 text-[11px]"></div>
         </div>
 
         <div id="quickAddSection" class="pt-1">
           <label class="block text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-1">
-            <i class="fa-solid fa-plus-circle text-gray-600 mr-1"></i> Tambah Kerabat Langsung:
+            <i class="fa-solid fa-plus-circle text-neutral-600 mr-1"></i> Tambah Kerabat Langsung:
           </label>
-          <div class="grid grid-cols-3 gap-1.5" id="quickAddButtons">
-          </div>
+          <div class="grid grid-cols-3 gap-1.5" id="quickAddButtons"></div>
         </div>
 
         <div id="detailModalActions" class="flex justify-between items-center pt-3 border-t border-neutral-100">
-          <button id="btnDeleteMember" onclick="" class="px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-xl text-xs font-semibold border border-neutral-300 flex items-center gap-1">
+          <button id="btnDeleteMember" class="px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-xl text-xs font-semibold border border-neutral-300 flex items-center gap-1">
             <i class="fa-solid fa-trash"></i> Hapus
           </button>
-          <button id="btnEditMember" onclick="" class="px-3.5 py-1.5 bg-gray-400 hover:bg-gray-500 text-neutral-950 rounded-xl text-xs font-bold shadow-sm flex items-center gap-1">
+          <button id="btnEditMember" class="px-3.5 py-1.5 bg-neutral-900 hover:bg-neutral-700 text-white rounded-xl text-xs font-bold shadow-sm flex items-center gap-1">
             <i class="fa-solid fa-user-pen"></i> Edit Data
           </button>
         </div>
-
       </div>
     </div>
   </div>
 
-  <div id="confirmModal" class="fixed inset-0 bg-neutral-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
+  <!-- Modal konfirmasi -->
+  <div id="confirmModal" class="fixed inset-0 bg-neutral-950/70 backdrop-blur-sm z-[60] flex items-center justify-center p-4 overflow-y-auto hidden">
     <div class="bg-white rounded-3xl shadow-2xl border border-neutral-300 max-w-sm w-full overflow-hidden p-5 text-center my-6">
       <div class="w-12 h-12 bg-neutral-100 text-neutral-900 rounded-2xl flex items-center justify-center text-xl mx-auto mb-3 border border-neutral-300">
         <i class="fa-solid fa-triangle-exclamation"></i>
       </div>
       <h3 id="confirmTitle" class="text-sm font-bold text-neutral-900 mb-1">Konfirmasi Hapus</h3>
       <p id="confirmMessage" class="text-xs text-neutral-600 mb-5 leading-relaxed">Apakah Anda yakin ingin menghapus data ini?</p>
-      
+
       <div class="flex justify-center gap-2">
-        <button onclick="closeConfirmModal()" class="w-1/2 py-2 border border-neutral-300 text-neutral-700 rounded-xl text-xs font-semibold hover:bg-neutral-100 transition">
-          Batal
-        </button>
-        <button id="confirmActionButton" class="w-1/2 py-2 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-bold shadow-sm transition">
-          Ya, Hapus
-        </button>
+        <button onclick="closeConfirmModal()" class="w-1/2 py-2 border border-neutral-300 text-neutral-700 rounded-xl text-xs font-semibold hover:bg-neutral-100 transition">Batal</button>
+        <button id="confirmActionButton" class="w-1/2 py-2 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-bold shadow-sm transition">Ya, Lanjutkan</button>
       </div>
     </div>
   </div>
 
-  <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-5 right-5 bg-neutral-900 text-white border border-neutral-700 px-3.5 py-2.5 rounded-2xl shadow-xl transition-all transform translate-y-20 opacity-0 z-50 flex items-center gap-2.5 text-xs font-semibold">
-    <i id="toastIcon" class="fa-solid fa-circle-check text-gray-400 text-sm"></i>
+  <div id="toast" role="status" aria-live="polite" class="fixed bottom-5 right-5 left-5 sm:left-auto sm:max-w-sm bg-neutral-900 text-white border border-neutral-700 px-3.5 py-2.5 rounded-2xl shadow-xl transition-all transform translate-y-20 opacity-0 z-[70] flex items-center gap-2.5 text-xs font-semibold pointer-events-none">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-neutral-300 text-sm"></i>
     <span id="toastMessage">Notifikasi</span>
   </div>
 
   <script>
-    // --- APP STATE ---
-    const STORAGE_KEY = 'peta_silsilah_keluarga_v3';
+    // ================= KAMUS ISTILAH INDONESIA & ACEH =================
+    const GENTREE_UP_INDO = {
+      1: "Orang Tua", 2: "Kakek / Nenek", 3: "Buyut", 4: "Canggah", 5: "Wareng",
+      6: "Udeg-udeg", 7: "Gantung Siwur", 8: "Kebok Tumpuk", 9: "Debog Bosok", 10: "Galih Asem",
+      11: "Siwur", 12: "Isizer", 13: "Giri", 14: "Gunung", 15: "Pramugari",
+      16: "Menya-menya", 17: "Kabanda", 18: "Trahing Kusuma"
+    };
+
+    const GENTREE_DOWN_INDO = [
+      "Anak", "Cucu", "Cicit", "Canggah", "Wareng", "Udeg-Udeg", "Gantung Siwur",
+      "Gropak Senthe", "Debog Bosok", "Galih Asem", "Gropak Watang", "Cendani",
+      "Menya-menya", "Menyaman", "Penitis", "Trah", "Kasuran"
+    ];
+
+    const GENTREE_UP_ACEH = {
+      1: "Yah-Mak", 2: "Syiek-Nek", 3: "Abeu-Syiek", 4: "Wa-Buyot", 5: "Nek-Tungkeet",
+      6: "Indatu-Jat", 7: "Indatu-Ala", 8: "Indatu-Sikok", 9: "Indatu-Sestor", 10: "Indatu-Aksar",
+      11: "Indatu-Salap", 12: "Indatu-Pramu", 13: "Indatu-Giri", 14: "Indatu-Wan", 15: "Indatu-Majet",
+      16: "Indatu-Sultan", 17: "Indatu-Moyang", 18: "Indatu-Puncak"
+    };
+
+    const GENTREE_DOWN_ACEH = [
+      "Anek-Ibon", "Cucu-Hapet", "Cuci-Sik", "Piet-Siden", "Tungkeet",
+      "Cahee-Tungkeet", "Cahee-Cucu", "Cahee-Sunsi", "Cahee-Walat", "Cahee-Siri",
+      "Cahee-Trah", "Cahee-Misan", "Cahee-Turunan", "Cahee-Sula", "Cahee-Keturunan",
+      "Cahee-Ginerasi", "Cahee-Ujong"
+    ];
+
+    // ================= STATE =================
+    const STORAGE_KEY = 'peta_silsilah_keluarga_v4';
     let familyMembers = [];
     let meId = null;
     let currentView = 'tree';
+    let activeMainTab = 'silsilah';
     let pendingConfirmAction = null;
     let isEditMode = true;
+    let currentModalExcludeId = null;
 
-    let visNodes = new vis.DataSet([]);
-    let visEdges = new vis.DataSet([]);
+    let isMultiConnectMode = false;
+    let multiFilterType = 'all';
+
+    let isConnectingMode = false;
+    let isDeletingEdgeMode = false;
+    let selectedSourceNodeId = null;
+    let selectedTargetNodeId = null;
+
+    const visNodes = new vis.DataSet([]);
+    const visEdges = new vis.DataSet([]);
     let networkGraph = null;
+    let toastTimer = null;
 
+    const PALETTE = {
+      male:   { bg: '#ffffff', border: '#262626', text: '#171717' },
+      female: { bg: '#e5e5e5', border: '#525252', text: '#171717' },
+      dead:   { bg: '#fafafa', border: '#a3a3a3', text: '#737373' },
+      me:     { bg: '#171717', border: '#000000', text: '#ffffff' },
+      fatherEdge: '#171717',
+      motherEdge: '#525252',
+      marriage: '#171717',
+      marriageDivorced: '#a3a3a3',
+      sibling: '#737373'
+    };
+
+    // ================= TAB MANAGEMENT =================
+    function switchMainTab(tab) {
+      activeMainTab = tab;
+      const btnSilsilah = document.getElementById('btnTabSilsilah');
+      const btnKalkulator = document.getElementById('btnTabKalkulator');
+      const viewSilsilah = document.getElementById('mainSilsilahView');
+      const viewKalkulator = document.getElementById('mainKalkulatorView');
+      const controls = document.getElementById('silsilahControls');
+
+      const activeBtnClass = "px-3 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-neutral-300 text-neutral-950";
+      const inactiveBtnClass = "px-3 py-1 rounded-lg text-xs font-semibold text-neutral-400 hover:text-white transition flex items-center gap-1";
+
+      if (tab === 'silsilah') {
+        btnSilsilah.className = activeBtnClass;
+        btnKalkulator.className = inactiveBtnClass;
+        viewSilsilah.classList.remove('hidden');
+        viewKalkulator.classList.add('hidden');
+        controls.classList.remove('hidden');
+        if (networkGraph && currentView !== 'cards') setTimeout(() => networkGraph.fit(), 150);
+      } else {
+        btnSilsilah.className = inactiveBtnClass;
+        btnKalkulator.className = activeBtnClass;
+        viewSilsilah.classList.add('hidden');
+        viewKalkulator.classList.remove('hidden');
+        controls.classList.add('hidden');
+        populateCalcMemberSelects();
+        runKinshipCalc();
+      }
+    }
+
+    // ================= KALKULATOR PANGGILAN LOGIC =================
+    function toggleCalcModeUI() {
+      const mode = document.getElementById('calcModeType').value;
+      document.getElementById('calcMemberGroup').classList.toggle('hidden', mode !== 'member_select');
+      document.getElementById('calcPresetGroup').classList.toggle('hidden', mode !== 'preset');
+      document.getElementById('calcGenGroup').classList.toggle('hidden', mode !== 'generation');
+      document.getElementById('manualOptionsGroup').classList.toggle('hidden', mode === 'member_select');
+      
+      if (mode === 'member_select') {
+        populateCalcMemberSelects();
+      }
+      runKinshipCalc();
+    }
+
+    function populateCalcMemberSelects() {
+      const srcSelect = document.getElementById('calcSourceMember');
+      const tgtSelect = document.getElementById('calcTargetMember');
+      if (!srcSelect || !tgtSelect) return;
+      
+      const options = familyMembers.map(m => `<option value="${m.id}">${escapeHtml(m.name)} (${m.id === meId ? 'SAYA' : (m.gender === 'L' ? 'Pria' : 'Wanita')})</option>`).join('');
+      
+      srcSelect.innerHTML = options;
+      tgtSelect.innerHTML = options;
+
+      if (meId) srcSelect.value = meId;
+      if (familyMembers.length > 1) {
+        const other = familyMembers.find(m => m.id !== meId);
+        if (other) tgtSelect.value = other.id;
+      }
+    }
+
+    function findRelationshipPath(srcId, tgtId) {
+      if (srcId === tgtId) return { type: 'self' };
+      const src = byId(srcId);
+      const tgt = byId(tgtId);
+      if (!src || !tgt) return null;
+
+      if (tgt.fatherId === srcId) return { type: 'child', level: -1 };
+      if (tgt.motherId === srcId) return { type: 'child', level: -1 };
+      if (src.fatherId === tgtId) return { type: 'parent', level: 1 };
+      if (src.motherId === tgtId) return { type: 'parent', level: 1 };
+
+      if (src.spouses && src.spouses.some(s => s.id === tgtId)) return { type: 'spouse' };
+      if (isSibling(srcId, tgtId)) return { type: 'sibling' };
+
+      const getAncestors = (id) => {
+        const anc = new Map();
+        const queue = [{ id: id, dist: 0 }];
+        while (queue.length) {
+          const curr = queue.shift();
+          const m = byId(curr.id);
+          if (!m) continue;
+          if (!anc.has(curr.id)) anc.set(curr.id, curr.dist);
+          if (m.fatherId) queue.push({ id: m.fatherId, dist: curr.dist + 1 });
+          if (m.motherId) queue.push({ id: m.motherId, dist: curr.dist + 1 });
+        }
+        return anc;
+      };
+
+      const srcAnc = getAncestors(srcId);
+      const tgtAnc = getAncestors(tgtId);
+
+      let lowestCA = null;
+      let minSum = Infinity;
+
+      for (const [ancId, dSrc] of srcAnc.entries()) {
+        if (tgtAnc.has(ancId)) {
+          const dTgt = tgtAnc.get(ancId);
+          const sum = dSrc + dTgt;
+          if (sum < minSum) {
+            minSum = sum;
+            lowestCA = { id: ancId, dSrc: dSrc, dTgt: dTgt };
+          }
+        }
+      }
+
+      if (lowestCA) {
+        return {
+          type: 'ancestor_path',
+          dSrc: lowestCA.dSrc,
+          dTgt: lowestCA.dTgt,
+          commonAncestorId: lowestCA.id
+        };
+      }
+
+      return null;
+    }
+
+    function runKinshipCalc() {
+      const mode = document.getElementById('calcModeType').value;
+      
+      let call = "";
+      let callSub = "";
+      let formalIndo = "";
+      let formalAceh = "";
+      let genGap = "";
+      let desc = "";
+
+      if (mode === 'member_select') {
+        const srcId = parseInt(document.getElementById('calcSourceMember').value);
+        const tgtId = parseInt(document.getElementById('calcTargetMember').value);
+
+        const src = byId(srcId);
+        const tgt = byId(tgtId);
+
+        if (!src || !tgt) return;
+
+        if (srcId === tgtId) {
+          document.getElementById('resCalcCall').innerText = "Diri Sendiri";
+          document.getElementById('resCalcCallSub').innerText = '"Profil yang dipilih adalah diri Anda sendiri"';
+          document.getElementById('resCalcFormalIndo').innerText = "Diri Sendiri";
+          document.getElementById('resCalcFormalAceh').innerText = "Droe Teuh";
+          document.getElementById('resCalcGenGap').innerText = "0 Level";
+          document.getElementById('resCalcDesc').innerText = "Anda memilih profil anggota yang sama.";
+          return;
+        }
+
+        const path = findRelationshipPath(srcId, tgtId);
+        const isOlder = tgt.birthDate && src.birthDate ? tgt.birthDate < src.birthDate : tgt.id < src.id;
+
+        if (path) {
+          if (path.type === 'parent') {
+            formalIndo = "Orang Tua";
+            formalAceh = "Yah-Mak";
+            genGap = "1 Generasi di Atas (+1)";
+            call = tgt.gender === 'L' ? "Ayah / Bapak" : "Ibu / Mama";
+            callSub = tgt.gender === 'L' ? "Sapaan lisan Aceh: Yah / Abu / Walèe" : "Sapaan lisan Aceh: Mak / Ummi / Ma";
+            desc = `${tgt.name} adalah orang tua kandung dari ${src.name}.`;
+          } else if (path.type === 'child') {
+            formalIndo = "Anak";
+            formalAceh = "Anek-Ibon";
+            genGap = "1 Generasi di Bawah (-1)";
+            call = "Anak / Nama Langsung";
+            callSub = "Sapaan lisan Aceh: Anek / [Nama]";
+            desc = `${tgt.name} adalah anak kandung dari ${src.name}.`;
+          } else if (path.type === 'spouse') {
+            formalIndo = "Pasangan (Suami/Istri)";
+            formalAceh = "Laki / Binoe";
+            genGap = "Generasi Sejajar (0 Level)";
+            call = tgt.gender === 'L' ? "Suami / Mas / Abang" : "Istri / Adik / Nama";
+            callSub = "Sapaan ikatan pernikahan aktif.";
+            desc = `${tgt.name} adalah pasangan sah dari ${src.name}.`;
+          } else if (path.type === 'sibling') {
+            formalIndo = isOlder ? "Kakak / Abang Kandung" : "Adik Kandung";
+            formalAceh = isOlder ? "Abang / Kakak Kandung" : "Adèe’ Kandung";
+            genGap = "Generasi Sejajar (0 Level)";
+            if (isOlder) call = tgt.gender === 'L' ? "Mas / Abang" : "Mbak / Kakak";
+            else call = "Adik / Nama Langsung";
+            callSub = isOlder ? "Sapaan lisan Aceh: Abang / Kak" : "Sapaan lisan Aceh: Adèe’ / [Nama]";
+            desc = `${tgt.name} dan ${src.name} adalah saudara kandung dari orang tua yang sama.`;
+          } else if (path.type === 'ancestor_path') {
+            const { dSrc, dTgt } = path;
+            const diff = dSrc - dTgt;
+
+            if (dSrc === 0) {
+              const nameGenIndo = GENTREE_DOWN_INDO[dTgt - 1] || `Keturunan Gen-${dTgt}`;
+              const nameGenAceh = GENTREE_DOWN_ACEH[dTgt - 1] || `Cahèe Gen-${dTgt}`;
+              formalIndo = nameGenIndo;
+              formalAceh = nameGenAceh;
+              genGap = `${dTgt} Generasi di Bawah (-${dTgt})`;
+              call = `${nameGenIndo} / Nama Langsung`;
+              callSub = `Keturunan langsung tingkat ke-${dTgt}`;
+              desc = `${tgt.name} adalah keturunan langsung (generasi -${dTgt}) dari ${src.name}.`;
+            } else if (dTgt === 0) {
+              const nameGenIndo = GENTREE_UP_INDO[dSrc] || `Leluhur Gen+${dSrc}`;
+              const nameGenAceh = GENTREE_UP_ACEH[dSrc] || `Indatu Gen+${dSrc}`;
+              formalIndo = nameGenIndo;
+              formalAceh = nameGenAceh;
+              genGap = `${dSrc} Generasi di Atas (+${dSrc})`;
+              call = dSrc === 2 ? (tgt.gender === 'L' ? "Kakek" : "Nenek") : (dSrc === 3 ? "Buyut" : `Mbah ${nameGenIndo}`);
+              callSub = `Sapaan lisan Aceh: ${nameGenAceh}`;
+              desc = `${tgt.name} adalah leluhur langsung (generasi +${dSrc}) dari ${src.name}.`;
+            } else if (dSrc === 1 && dTgt === 1) {
+              formalIndo = isOlder ? "Kakak / Abang Sepupu" : "Adik Sepupu";
+              formalAceh = "Syedara Sepupu Sekali";
+              genGap = "Generasi Sejajar (0 Level)";
+              call = isOlder ? (tgt.gender === 'L' ? "Mas / Abang" : "Mbak / Kakak") : "Adik / Nama Langsung";
+              callSub = isOlder ? "Sapaan lisan Aceh: Abang / Kak" : "Sapaan lisan Aceh: Adèe’ / [Nama]";
+              desc = `${tgt.name} adalah sepupu sekali (anak dari paman/bibi) dari ${src.name}.`;
+            } else if (dSrc === 1 && dTgt > 1) {
+              formalIndo = "Paman / Bibi (Pakde / Bude / Paklek / Bulek)";
+              formalAceh = isOlder ? "Awa / Wa" : "Pak Tjut / Mak Tjut";
+              genGap = "1 Generasi di Atas (+1)";
+              call = tgt.gender === 'L' ? "Paman / Om / Pakde / Paklek" : "Bibi / Tante / Bude / Bulek";
+              callSub = "Sapaan lisan Aceh: Yah Wa / Pak Tjut / Mak Tjut";
+              desc = `${tgt.name} berada 1 generasi di atas ${src.name}.`;
+            } else if (dSrc > 1 && dTgt === 1) {
+              formalIndo = "Keponakan";
+              formalAceh = "Anek Syedara";
+              genGap = "1 Generasi di Bawah (-1)";
+              call = "Keponakan / Nama Langsung";
+              callSub = "Sapaan lisan Aceh: Adèe’ / [Nama]";
+              desc = `${tgt.name} adalah keponakan (anak dari saudara/sepupu) dari ${src.name}.`;
+            } else {
+              formalIndo = `Kerabat Generasi (${diff > 0 ? '+' + diff : diff})`;
+              formalAceh = `Syedara Lintas Generasi`;
+              genGap = `${Math.abs(diff)} Level Generasi`;
+              call = isOlder ? "Abang / Kakak / Paman" : "Adik / Keponakan";
+              callSub = "Dihitung dari garis silsilah keluarga";
+              desc = `${tgt.name} terhubung melalui jalur silsilah keluarga dengan ${src.name}.`;
+            }
+          }
+        } else {
+          formalIndo = "Belum Terhubung Tali";
+          formalAceh = "Golom Meuhubong";
+          genGap = "Tidak Terhubung";
+          call = "Saudara / Nama";
+          callSub = "Belum ada garis relasi di bagan silsilah";
+          desc = `Belum ada garis pernikahan atau orang tua yang menghubungkan ${src.name} dengan ${tgt.name}. Anda dapat menghubungkannya di peta silsilah.`;
+        }
+      } else {
+        const gender = document.getElementById('calcGender').value;
+        const ageRel = document.getElementById('calcAgeRel').value;
+
+        if (mode === 'preset') {
+          const preset = document.getElementById('calcPresetSelect').value;
+
+          if (preset === 'sepupu1') {
+            formalIndo = "Sepupu Sekali (First Cousin)";
+            formalAceh = "Syedara Sepupu Sekali (Anek Wa / Pak Tjut)";
+            genGap = "Generasi Sejajar (0 Level)";
+            desc = "Anak dari Paman atau Bibi Anda. Memiliki Kakek/Nenek yang sama.";
+            call = ageRel === 'older' ? (gender === 'L' ? "Mas / Abang" : "Mbak / Kakak") : "Adik / Nama Langsung";
+            callSub = ageRel === 'older' ? "Sapaan Aceh: Abang / Kak" : "Sapaan Aceh: Adèe’ / [Nama]";
+          } else if (preset === 'sepupu2_buyut') {
+            formalIndo = "Sepupu Dua Kali (Second Cousin)";
+            formalAceh = "Syedara Sepupu Dua Kali (Anek Wa-Buyot)";
+            genGap = "Generasi Sejajar (0 Level)";
+            desc = "Kerabat sejajar yang dihubungkan oleh Buyut yang sama (derajat generasi ke-3 ke atas).";
+            call = ageRel === 'older' ? (gender === 'L' ? "Mas / Abang" : "Mbak / Kakak") : "Adik / Nama Langsung";
+            callSub = "Sapaan kerabat sepupu derajat kedua.";
+          } else if (preset === 'paman_bibi') {
+            formalIndo = "Paman / Bibi (Om / Tante / Pakde / Bude)";
+            formalAceh = "Wa / Pak Tjut / Mak Tjut";
+            genGap = "1 Generasi di Atas (+1)";
+            desc = "Saudara kandung dari Ayah atau Ibu Anda.";
+            call = gender === 'L' ? "Paman / Om / Pakde / Paklek" : "Bibi / Tante / Bude / Bulek";
+            callSub = "Penghormatan untuk generasi selevel orang tua.";
+          } else if (preset === 'keponakan') {
+            formalIndo = "Keponakan Kandung";
+            formalAceh = "Anek Syedara";
+            genGap = "1 Generasi di Bawah (-1)";
+            desc = "Anak dari saudara kandung Anda.";
+            call = "Keponakan / Nama / Nak";
+            callSub = "Sapaan untuk generasi di bawah Anda.";
+          }
+        } else {
+          const level = parseInt(document.getElementById('calcGenLevel').value);
+
+          if (level > 0) {
+            const nameGenIndo = GENTREE_UP_INDO[level] || `Leluhur Gen +${level}`;
+            const nameGenAceh = GENTREE_UP_ACEH[level] || `Indatu Gen +${level}`;
+            genGap = `${level} Generasi di Atas (+${level})`;
+            formalIndo = nameGenIndo;
+            formalAceh = nameGenAceh;
+
+            if (level === 1) call = gender === 'L' ? "Ayah / Bapak" : "Ibu / Mama";
+            else if (level === 2) call = gender === 'L' ? "Kakek / Mbah" : "Nenek / Mbah";
+            else call = `Mbah / Leluhur (${nameGenIndo})`;
+            
+            callSub = `Sapaan lisan Aceh: ${nameGenAceh}`;
+            desc = `Leluhur garis lurus tingkat ke-${level} di atas Anda.`;
+          } else {
+            const absLevel = Math.abs(level);
+            const nameGenIndo = GENTREE_DOWN_INDO[absLevel - 1] || `Keturunan Gen -${absLevel}`;
+            const nameGenAceh = GENTREE_DOWN_ACEH[absLevel - 1] || `Cahèe Gen -${absLevel}`;
+            genGap = `${absLevel} Generasi di Bawah (-${absLevel})`;
+            formalIndo = nameGenIndo;
+            formalAceh = nameGenAceh;
+
+            if (level === -1) call = "Anak / Nak";
+            else if (level === -2) call = "Cucu";
+            else call = `Keturunan (${nameGenIndo})`;
+
+            callSub = `Sapaan lisan Aceh: ${nameGenAceh}`;
+            desc = `Garis keturunan langsung tingkat ke-${absLevel} di bawah Anda.`;
+          }
+        }
+      }
+
+      document.getElementById('resCalcCall').innerText = call;
+      document.getElementById('resCalcCallSub').innerText = `"${callSub}"`;
+      document.getElementById('resCalcFormalIndo').innerText = formalIndo;
+      document.getElementById('resCalcFormalAceh').innerText = formalAceh;
+      document.getElementById('resCalcGenGap').innerText = genGap;
+      document.getElementById('resCalcDesc').innerText = desc;
+    }
+
+    // ================= UTIL =================
     function escapeHtml(str) {
-      if (!str) return '';
+      if (str === null || str === undefined) return '';
       return String(str)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -612,29 +1195,116 @@
     }
 
     function getDefaultAvatarSVG(gender = 'L') {
-      const bg = gender === 'P' ? '#f3f4f6' : '#f3f4f6';
-      const fg = gender === 'P' ? '#4b5563' : '#374151';
+      const bg = gender === 'P' ? '#e5e5e5' : '#f5f5f5';
+      const fg = gender === 'P' ? '#525252' : '#404040';
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="${bg}"/><path d="M50 25 a15 15 0 1 0 0.1 0 Z M25 75 a25 25 0 0 1 50 0 Z" fill="${fg}"/></svg>`;
       return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
     }
 
+    function isDefaultAvatar(url) {
+      return !url || String(url).startsWith('data:image/svg+xml;utf8,');
+    }
+
+    function photoOf(m) {
+      return isDefaultAvatar(m.photoUrl) ? getDefaultAvatarSVG(m.gender) : m.photoUrl;
+    }
+
+    function byId(id) {
+      return familyMembers.find(m => m.id === id);
+    }
+
+    function getChildren(member) {
+      return familyMembers.filter(c => c.fatherId === member.id || c.motherId === member.id);
+    }
+
+    function getDescendantsByLevel(startMember, maxDepth = 17) {
+      const result = {};
+      
+      function traverse(currentMember, depth) {
+        if (depth > maxDepth) return;
+        const children = getChildren(currentMember);
+        if (children.length === 0) return;
+
+        if (!result[depth]) result[depth] = [];
+        
+        children.forEach(child => {
+          if (!result[depth].some(c => c.id === child.id)) {
+            result[depth].push(child);
+          }
+          traverse(child, depth + 1);
+        });
+      }
+
+      traverse(startMember, 1);
+      return result;
+    }
+
+    function showToast(msg, type = "success") {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMessage').innerText = msg;
+      document.getElementById('toastIcon').className = type === "error"
+        ? "fa-solid fa-circle-exclamation text-neutral-300 text-sm"
+        : "fa-solid fa-circle-check text-neutral-300 text-sm";
+
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3200);
+    }
+
+    function readAndResizeImage(file, maxSize, callback) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, Math.round(img.width * scale));
+          canvas.height = Math.max(1, Math.round(img.height * scale));
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          callback(canvas.toDataURL('image/jpeg', 0.82));
+        };
+        img.onerror = () => showToast("Gagal membaca gambar!", "error");
+        img.src = e.target.result;
+      };
+      reader.onerror = () => showToast("Gagal membaca file!", "error");
+      reader.readAsDataURL(file);
+    }
+
+    // ================= DATA =================
     window.onload = function() {
-      loadData();
       initVisNetwork();
+      loadData();
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          if (familyMembers.length && currentView !== 'cards') updateGraphData();
+        });
+      }
     };
 
     function loadData() {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      let saved = null;
+      try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) { saved = null; }
+
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          familyMembers = parsed.members || [];
+          familyMembers = Array.isArray(parsed.members) ? parsed.members : [];
           meId = parsed.meId || null;
-        } catch(e) {
+        } catch (e) {
           familyMembers = [];
           meId = null;
         }
       }
+
+      normalizeData();
 
       if (!meId || familyMembers.length === 0) {
         document.getElementById('initMeModal').classList.remove('hidden');
@@ -643,61 +1313,376 @@
       }
     }
 
-    function saveData() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        meId: meId,
-        members: familyMembers
-      }));
+    function normalizeData() {
+      familyMembers = familyMembers.filter(m => m && typeof m === 'object' && m.id !== undefined && m.id !== null);
+
+      const seen = new Set();
+      familyMembers = familyMembers.filter(m => {
+        m.id = Number(m.id);
+        if (!Number.isFinite(m.id) || seen.has(m.id)) return false;
+        seen.add(m.id);
+        return true;
+      });
+
+      familyMembers.forEach(m => {
+        m.gender = m.gender === 'P' ? 'P' : 'L';
+        m.isAlive = m.isAlive !== false;
+        m.name = String(m.name || '').trim() || 'Tanpa Nama';
+        m.nickname = String(m.nickname || '');
+        ['birthDate', 'deathDate', 'birthPlace', 'job', 'phone', 'address', 'notes'].forEach(k => { m[k] = String(m[k] || ''); });
+        m.photoUrl = isDefaultAvatar(m.photoUrl) ? '' : String(m.photoUrl);
+        
+        if (!Array.isArray(m.spouses)) {
+          m.spouses = [];
+          if (m.spouseId) {
+            m.spouses.push({ id: Number(m.spouseId), status: 'active' });
+          }
+        }
+        
+        m.spouses = m.spouses.map(s => {
+          if (typeof s === 'number') return { id: s, status: 'active' };
+          return { id: Number(s.id), status: s.status === 'divorced' ? 'divorced' : 'active' };
+        }).filter(s => s.id && seen.has(s.id) && s.id !== m.id);
+
+        ['fatherId', 'motherId', 'siblingOfId'].forEach(k => {
+          const v = m[k] ? Number(m[k]) : null;
+          m[k] = (v && seen.has(v) && v !== m.id) ? v : null;
+        });
+        if (!['Kakak', 'Adik'].includes(m.siblingOrder)) m.siblingOrder = null;
+      });
+
+      if (!seen.has(Number(meId))) meId = familyMembers.length ? familyMembers[0].id : null;
+      else meId = Number(meId);
+      familyMembers.forEach(m => { m.isMe = m.id === meId; });
+
+      familyMembers.forEach(m => {
+        m.spouses.forEach(s => {
+          const sp = byId(s.id);
+          if (sp) {
+            if (!sp.spouses.some(x => x.id === m.id)) {
+              sp.spouses.push({ id: m.id, status: s.status });
+            }
+          }
+        });
+      });
+
+      familyMembers.forEach(m => {
+        if (!m.siblingOfId) return;
+        const s = byId(m.siblingOfId);
+        if (!s) return;
+        ['fatherId', 'motherId'].forEach(slot => {
+          if (!m[slot] && s[slot] && s[slot] !== m.id) m[slot] = s[slot];
+          if (!s[slot] && m[slot] && m[slot] !== s.id) s[slot] = m[slot];
+        });
+      });
+
+      familyMembers.forEach(p => { p.childrenIds = []; });
+      familyMembers.forEach(c => {
+        [c.fatherId, c.motherId].forEach(pid => {
+          if (!pid) return;
+          const p = byId(pid);
+          if (p && !p.childrenIds.includes(c.id)) p.childrenIds.push(c.id);
+        });
+      });
     }
 
+    function saveData() {
+      normalizeData();
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ meId: meId, members: familyMembers }));
+      } catch (e) {
+        showToast("Penyimpanan peramban penuh! Ekspor JSON sebagai cadangan.", "error");
+      }
+    }
+
+    // ================= MODE =================
     function setEditMode(enable) {
       isEditMode = enable;
+      exitSpecialCanvasModes();
+
       const btnEdit = document.getElementById('btnModeEdit');
       const btnView = document.getElementById('btnModeView');
+      const on = "px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-neutral-300 text-neutral-950";
+      const off = "px-2.5 py-1 rounded-lg text-xs font-semibold text-neutral-400 hover:text-white transition flex items-center gap-1";
 
-      if (isEditMode) {
-        btnEdit.className = "px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gray-400 text-neutral-950";
-        btnView.className = "px-2.5 py-1 rounded-lg text-xs font-semibold text-neutral-400 hover:text-white transition flex items-center gap-1";
-        showToast("Mode Edit Aktif");
-      } else {
-        btnView.className = "px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-gray-400 text-neutral-950";
-        btnEdit.className = "px-2.5 py-1 rounded-lg text-xs font-semibold text-neutral-400 hover:text-white transition flex items-center gap-1";
-        showToast("Mode Lihat Saja Aktif");
-      }
-
+      btnEdit.className = isEditMode ? on : off;
+      btnView.className = isEditMode ? off : on;
+      showToast(isEditMode ? "Mode Edit aktif" : "Mode Lihat Saja aktif");
       applyModeUI();
     }
 
     function applyModeUI() {
-      const btnAddMember = document.getElementById('btnHeaderAddMember');
-      const btnReset = document.getElementById('btnHeaderReset');
-      const lblImport = document.getElementById('lblHeaderImport');
-      const btnEditMe = document.getElementById('btnEditMe');
+      ['btnHeaderAddMember', 'btnHeaderReset', 'lblHeaderImport', 'btnEditMe', 'btnConnectManual', 'btnDeleteEdge'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('hidden', !isEditMode);
+      });
+    }
 
-      if (isEditMode) {
-        if (btnAddMember) btnAddMember.classList.remove('hidden');
-        if (btnReset) btnReset.classList.remove('hidden');
-        if (lblImport) lblImport.classList.remove('hidden');
-        if (btnEditMe) btnEditMe.classList.remove('hidden');
-      } else {
-        if (btnAddMember) btnAddMember.classList.add('hidden');
-        if (btnReset) btnReset.classList.add('hidden');
-        if (lblImport) lblImport.classList.add('hidden');
-        if (btnEditMe) btnEditMe.classList.add('hidden');
+    // ================= MODE TALI MANUAL =================
+    function setBanner(html) {
+      const banner = document.getElementById('modeStatusBanner');
+      if (!html) { banner.classList.add('hidden'); return; }
+      document.getElementById('modeStatusText').innerHTML = html;
+      banner.classList.remove('hidden');
+    }
+
+    function toggleConnectMode() {
+      if (!isEditMode) return;
+      const turnOn = !isConnectingMode;
+      exitSpecialCanvasModes();
+      if (turnOn) {
+        isConnectingMode = true;
+        setBanner(`<i class="fa-solid fa-diagram-next text-neutral-300 mr-2"></i> Klik anggota PERTAMA yang ingin dihubungkan...`);
+        showToast("Mode Hubungkan Tali aktif. Klik anggota pertama.");
       }
     }
 
+    function toggleDeleteEdgeMode() {
+      if (!isEditMode) return;
+      const turnOn = !isDeletingEdgeMode;
+      exitSpecialCanvasModes();
+      if (turnOn) {
+        isDeletingEdgeMode = true;
+        setBanner(`<i class="fa-solid fa-link-slash text-neutral-300 mr-2"></i> Mode Hapus Tali: klik garis relasi pada bagan untuk menghapusnya.`);
+        showToast("Klik garis tali untuk menghapus relasi.");
+      }
+    }
+
+    function exitSpecialCanvasModes() {
+      isConnectingMode = false;
+      isDeletingEdgeMode = false;
+      selectedSourceNodeId = null;
+      selectedTargetNodeId = null;
+      setBanner('');
+    }
+
+    function closeEdgeTypeModal() {
+      document.getElementById('edgeTypeModal').classList.add('hidden');
+      exitSpecialCanvasModes();
+    }
+
+    function confirmManualConnection() {
+      if (!selectedSourceNodeId || !selectedTargetNodeId) return;
+
+      const relType = document.getElementById('edgeRelationSelect').value;
+      const source = byId(selectedSourceNodeId);
+      const target = byId(selectedTargetNodeId);
+      if (!source || !target) return;
+
+      let status = 'active';
+      let actualRelType = relType;
+      if (relType === 'spouse_divorced') {
+        actualRelType = 'spouse';
+        status = 'divorced';
+      }
+
+      const ok = applyRelationToMembers(source, target, actualRelType, status);
+      if (ok) {
+        saveData();
+        renderAll();
+        showToast(`Berhasil menghubungkan ${source.name} dengan ${target.name}!`);
+      }
+      closeEdgeTypeModal();
+    }
+
+    // ================= LOGIKA RELASI =================
+    function isAncestor(ancestorId, personId) {
+      if (!ancestorId || !personId) return false;
+      if (ancestorId === personId) return true;
+
+      const visited = new Set();
+      const queue = [personId];
+
+      while (queue.length > 0) {
+        const currId = queue.shift();
+        if (visited.has(currId)) continue;
+        visited.add(currId);
+
+        const curr = byId(currId);
+        if (!curr) continue;
+
+        const parents = [curr.fatherId, curr.motherId].filter(Boolean);
+        for (const pid of parents) {
+          if (pid === ancestorId) return true;
+          if (!visited.has(pid)) queue.push(pid);
+        }
+      }
+      return false;
+    }
+
+    function isSibling(idA, idB) {
+      if (idA === idB) return false;
+      const a = byId(idA);
+      const b = byId(idB);
+      if (!a || !b) return false;
+
+      if (a.siblingOfId === b.id || b.siblingOfId === a.id) return true;
+      if (a.fatherId && b.fatherId && a.fatherId === b.fatherId) return true;
+      if (a.motherId && b.motherId && a.motherId === b.motherId) return true;
+
+      return false;
+    }
+
+    function linkParentChild(parent, child, slot) {
+      if (!parent || !child) return false;
+
+      if (parent.id === child.id) {
+        showToast("Relasi tidak valid: Seseorang tidak bisa menjadi orang tua dari dirinya sendiri.", "error");
+        return false;
+      }
+
+      if (isAncestor(child.id, parent.id)) {
+        showToast(`Relasi tidak valid: ${child.name} sudah merupakan leluhur/orang tua dari ${parent.name}.`, "error");
+        return false;
+      }
+
+      if (slot === 'fatherId' && parent.gender !== 'L') {
+        showToast(`Gagal: ${parent.name} berjenis kelamin Perempuan, tidak bisa dijadikan Ayah.`, "error");
+        return false;
+      }
+      if (slot === 'motherId' && parent.gender !== 'P') {
+        showToast(`Gagal: ${parent.name} berjenis kelamin Laki-Laki, tidak bisa dijadikan Ibu.`, "error");
+        return false;
+      }
+
+      child[slot] = parent.id;
+      return true;
+    }
+
+    function makeSpouses(a, b, status = 'active') {
+      if (a.id === b.id) {
+        showToast("Relasi tidak valid: Tidak bisa menikah dengan diri sendiri.", "error");
+        return false;
+      }
+
+      if (isAncestor(a.id, b.id) || isAncestor(b.id, a.id)) {
+        showToast("Relasi tidak valid: Orang tua dan keturunan langsung tidak bisa dijadikan pasangan.", "error");
+        return false;
+      }
+
+      if (isSibling(a.id, b.id)) {
+        showToast("Relasi tidak valid: Saudara kandung tidak bisa dijadikan pasangan.", "error");
+        return false;
+      }
+
+      const idxA = a.spouses.findIndex(s => s.id === b.id);
+      if (idxA >= 0) a.spouses[idxA].status = status;
+      else a.spouses.push({ id: b.id, status: status });
+
+      const idxB = b.spouses.findIndex(s => s.id === a.id);
+      if (idxB >= 0) b.spouses[idxB].status = status;
+      else b.spouses.push({ id: a.id, status: status });
+
+      return true;
+    }
+
+    function attachChildToParent(parent, child, slot) {
+      slot = slot || (parent.gender === 'L' ? 'fatherId' : 'motherId');
+      if (!linkParentChild(parent, child, slot)) return false;
+
+      const otherSlot = slot === 'fatherId' ? 'motherId' : 'fatherId';
+      if (!child[otherSlot]) {
+        const activeSpouse = parent.spouses.find(s => s.status === 'active');
+        if (activeSpouse) {
+          const sp = byId(activeSpouse.id);
+          const fitsSlot = sp && ((otherSlot === 'fatherId') === (sp.gender === 'L'));
+          if (sp && fitsSlot && sp.id !== child.id && !isAncestor(child.id, sp.id)) {
+            child[otherSlot] = sp.id;
+          }
+        }
+      }
+      return true;
+    }
+
+    function applyRelationToMembers(member, target, relationType, spouseStatus = 'active') {
+      if (!member || !target) return false;
+
+      if (member.id === target.id) {
+        showToast("Tidak bisa menghubungkan anggota dengan dirinya sendiri.", "error");
+        return false;
+      }
+
+      switch (relationType) {
+        case 'spouse':
+          return makeSpouses(member, target, spouseStatus);
+
+        case 'father':
+          if (member.gender !== 'L') {
+            showToast(`${member.name} berjenis kelamin Perempuan, tidak bisa menjadi Ayah. Ubah gender terlebih dahulu.`, "error");
+            return false;
+          }
+          return attachChildToParent(member, target, 'fatherId');
+
+        case 'mother':
+          if (member.gender !== 'P') {
+            showToast(`${member.name} berjenis kelamin Laki-Laki, tidak bisa menjadi Ibu. Ubah gender terlebih dahulu.`, "error");
+            return false;
+          }
+          return attachChildToParent(member, target, 'motherId');
+
+        case 'child':
+          return attachChildToParent(target, member);
+
+        case 'parent':
+          return attachChildToParent(member, target);
+
+        case 'sibling':
+        case 'olderSibling':
+        case 'youngerSibling': {
+          if (isAncestor(member.id, target.id) || isAncestor(target.id, member.id)) {
+            showToast("Relasi tidak valid: Anggota dengan hubungan leluhur/keturunan tidak bisa menjadi saudara kandung.", "error");
+            return false;
+          }
+
+          ['fatherId', 'motherId'].forEach(slot => {
+            const pid = target[slot];
+            if (pid && pid !== member.id && !isAncestor(member.id, pid)) {
+              member[slot] = pid;
+            }
+          });
+          member.siblingOrder = relationType === 'olderSibling' ? 'Kakak' :
+                                relationType === 'youngerSibling' ? 'Adik' : null;
+          member.siblingOfId = target.id;
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function removeRelationshipEdge(fromId, toId) {
+      const from = byId(fromId);
+      const to = byId(toId);
+
+      if (to) {
+        if (to.fatherId === fromId) to.fatherId = null;
+        if (to.motherId === fromId) to.motherId = null;
+        if (to.siblingOfId === fromId) to.siblingOfId = null;
+        to.spouses = to.spouses.filter(s => s.id !== fromId);
+      }
+      if (from) {
+        if (from.fatherId === toId) from.fatherId = null;
+        if (from.motherId === toId) from.motherId = null;
+        if (from.siblingOfId === toId) from.siblingOfId = null;
+        from.spouses = from.spouses.filter(s => s.id !== toId);
+      }
+
+      saveData();
+      renderAll();
+      exitSpecialCanvasModes();
+      showToast("Tali relasi berhasil dihapus.");
+    }
+
+    // ================= KONFIRMASI =================
     function openConfirmModal(title, message, onConfirm) {
       document.getElementById('confirmTitle').innerText = title;
       document.getElementById('confirmMessage').innerText = message;
       pendingConfirmAction = onConfirm;
 
-      const actionBtn = document.getElementById('confirmActionButton');
-      actionBtn.onclick = function() {
-        if (pendingConfirmAction) pendingConfirmAction();
+      document.getElementById('confirmActionButton').onclick = function() {
+        const action = pendingConfirmAction;
         closeConfirmModal();
+        if (action) action();
       };
-
       document.getElementById('confirmModal').classList.remove('hidden');
     }
 
@@ -706,40 +1691,35 @@
       pendingConfirmAction = null;
     }
 
+    // ================= FOTO =================
     function previewInitPhoto(input) {
-      if (input.files && input.files[0]) {
-        const file = input.files[0];
-        if (file.size > 2 * 1024 * 1024) {
-          showToast("Ukuran foto maksimal 2MB!", "error");
-          input.value = "";
-          return;
-        }
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('initPhotoData').value = e.target.result;
-          document.getElementById('initPhotoPreviewImg').src = e.target.result;
-          document.getElementById('initPhotoPreviewBox').classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      if (file.size > 10 * 1024 * 1024) {
+        showToast("Ukuran foto maksimal 10MB!", "error");
+        input.value = "";
+        return;
       }
+      readAndResizeImage(file, 320, function(dataUrl) {
+        document.getElementById('initPhotoData').value = dataUrl;
+        document.getElementById('initPhotoPreviewImg').src = dataUrl;
+        document.getElementById('initPhotoPreviewBox').classList.remove('hidden');
+      });
     }
 
     function previewFormPhoto(input) {
-      if (input.files && input.files[0]) {
-        const file = input.files[0];
-        if (file.size > 2 * 1024 * 1024) {
-          showToast("Ukuran foto maksimal 2MB!", "error");
-          input.value = "";
-          return;
-        }
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          document.getElementById('formPhotoData').value = e.target.result;
-          document.getElementById('formPhotoPreviewImg').src = e.target.result;
-          document.getElementById('formPhotoPreviewContainer').classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      if (file.size > 10 * 1024 * 1024) {
+        showToast("Ukuran foto maksimal 10MB!", "error");
+        input.value = "";
+        return;
       }
+      readAndResizeImage(file, 320, function(dataUrl) {
+        document.getElementById('formPhotoData').value = dataUrl;
+        document.getElementById('formPhotoPreviewImg').src = dataUrl;
+        document.getElementById('formPhotoPreviewContainer').classList.remove('hidden');
+      });
     }
 
     function clearUploadedFormPhoto() {
@@ -748,39 +1728,37 @@
       document.getElementById('formPhotoPreviewContainer').classList.add('hidden');
     }
 
+    // ================= PROFIL AWAL =================
     function saveInitMe(e) {
       e.preventDefault();
       const name = document.getElementById('initName').value.trim();
-      const nickname = document.getElementById('initNickname').value.trim();
-      const gender = document.getElementById('initGender').value;
-      const birthDate = document.getElementById('initBirthDate').value;
-      const job = document.getElementById('initJob').value.trim();
-      const uploadedPhoto = document.getElementById('initPhotoData').value;
-
       if (!name) return;
 
-      const newMe = {
+      const gender = document.getElementById('initGender').value;
+      const nickname = document.getElementById('initNickname').value.trim();
+
+      familyMembers = [{
         id: 1,
         isMe: true,
         name: name,
         nickname: nickname || name.split(' ')[0],
         gender: gender,
         isAlive: true,
-        birthDate: birthDate,
+        birthDate: document.getElementById('initBirthDate').value,
         birthPlace: "",
         deathDate: "",
-        job: job,
-        photoUrl: uploadedPhoto || getDefaultAvatarSVG(gender),
+        job: document.getElementById('initJob').value.trim(),
+        photoUrl: document.getElementById('initPhotoData').value || "",
         phone: "",
         address: "",
         notes: "Pusat silsilah keluarga",
         fatherId: null,
         motherId: null,
-        spouseId: null,
+        spouses: [],
+        siblingOfId: null,
+        siblingOrder: null,
         childrenIds: []
-      };
-
-      familyMembers = [newMe];
+      }];
       meId = 1;
 
       saveData();
@@ -789,6 +1767,7 @@
       showToast("Profil SAYA berhasil dibuat!");
     }
 
+    // ================= RENDER =================
     function renderAll() {
       applyModeUI();
       updateMeSummaryCard();
@@ -799,45 +1778,28 @@
     }
 
     function updateMeSummaryCard() {
-      const me = familyMembers.find(m => m.id === meId);
+      const me = byId(meId);
       if (!me) return;
 
       document.getElementById('meName').innerText = me.name + (me.nickname ? ` (${me.nickname})` : '');
-      let details = `${me.gender === 'L' ? 'Pria' : 'Wanita'}`;
+      let details = me.gender === 'L' ? 'Pria' : 'Wanita';
       if (me.job) details += ` • ${me.job}`;
       document.getElementById('meDetails').innerText = details;
-      document.getElementById('meAvatar').src = me.photoUrl || getDefaultAvatarSVG(me.gender);
+      document.getElementById('meAvatar').src = photoOf(me);
     }
 
     function updateStatistics() {
-      const total = familyMembers.length;
-      const male = familyMembers.filter(m => m.gender === 'L').length;
-      const female = familyMembers.filter(m => m.gender === 'P').length;
-      const alive = familyMembers.filter(m => m.isAlive).length;
+      const levels = computeGenerationalLevels();
+      const maxLevel = familyMembers.length ? Math.max(...Object.values(levels)) + 1 : 0;
 
-      document.getElementById('statTotal').innerText = total;
-      document.getElementById('statMale').innerText = male;
-      document.getElementById('statFemale').innerText = female;
-      document.getElementById('statAlive').innerText = alive;
-      document.getElementById('statTotalGenerations').innerText = `${calculateGenerations()} Generasi`;
+      document.getElementById('statTotal').innerText = familyMembers.length;
+      document.getElementById('statMale').innerText = familyMembers.filter(m => m.gender === 'L').length;
+      document.getElementById('statFemale').innerText = familyMembers.filter(m => m.gender === 'P').length;
+      document.getElementById('statAlive').innerText = familyMembers.filter(m => m.isAlive).length;
+      document.getElementById('statTotalGenerations').innerText = `${maxLevel} Generasi`;
     }
 
-    function calculateGenerations() {
-      if (familyMembers.length === 0) return 0;
-      let maxDepth = 1;
-      familyMembers.forEach(m => {
-        let depth = 1;
-        let curr = m;
-        while (curr && (curr.fatherId || curr.motherId)) {
-          depth++;
-          curr = familyMembers.find(p => p.id === (curr.fatherId || curr.motherId));
-        }
-        if (depth > maxDepth) maxDepth = depth;
-      });
-      return maxDepth;
-    }
-
-      function renderMemberList() {
+    function renderMemberList() {
       const container = document.getElementById('memberListContainer');
       const search = document.getElementById('searchInput').value.toLowerCase();
       const genderFilter = document.getElementById('filterGender').value;
@@ -857,16 +1819,14 @@
 
       container.innerHTML = filtered.map(m => {
         const isMe = m.id === meId;
-        const safePhoto = m.photoUrl || getDefaultAvatarSVG(m.gender);
-        const safeName = escapeHtml(m.name);
         return `
-          <div onclick="openDetailModal(${m.id})" class="p-2 border ${isMe ? 'border-gray-400 bg-gray-50' : 'border-neutral-200 bg-white'} rounded-xl hover:border-neutral-800 transition cursor-pointer flex items-center justify-between group">
+          <div onclick="openDetailModal(${m.id})" class="p-2 border ${isMe ? 'border-neutral-400 bg-neutral-100' : 'border-neutral-200 bg-white'} rounded-xl hover:border-neutral-800 transition cursor-pointer flex items-center justify-between group">
             <div class="flex items-center gap-2 min-w-0">
-              <img src="${safePhoto}" onerror="this.src=getDefaultAvatarSVG('${m.gender}')" class="w-7 h-7 rounded-lg bg-neutral-100 object-cover flex-shrink-0 border border-neutral-300">
+              <img src="${escapeHtml(photoOf(m))}" alt="" onerror="this.onerror=null;this.src=getDefaultAvatarSVG('${m.gender}')" class="w-7 h-7 rounded-lg bg-neutral-100 object-cover flex-shrink-0 border border-neutral-300">
               <div class="min-w-0">
                 <h4 class="text-xs font-bold text-neutral-800 truncate group-hover:text-black flex items-center gap-1">
-                  ${safeName}
-                  ${isMe ? '<span class="text-[9px] bg-gray-300 text-neutral-950 font-extrabold px-1 rounded">[SAYA]</span>' : ''}
+                  ${escapeHtml(m.name)}
+                  ${isMe ? '<span class="text-[9px] bg-neutral-900 text-white font-extrabold px-1 rounded">SAYA</span>' : ''}
                 </h4>
                 <p class="text-[10px] text-neutral-500 truncate">${m.gender === 'L' ? 'Laki-Laki' : 'Perempuan'} ${!m.isAlive ? '• Wafat' : ''}</p>
               </div>
@@ -877,200 +1837,559 @@
       }).join('');
     }
 
+    function computeGenerationalLevels() {
+      const levels = {};
+      familyMembers.forEach(m => { levels[m.id] = 0; });
+
+      const limit = familyMembers.length * 3 + 5;
+      for (let i = 0; i < limit; i++) {
+        let changed = false;
+        familyMembers.forEach(m => {
+          [m.fatherId, m.motherId].forEach(pid => {
+            if (pid && levels[pid] !== undefined && levels[m.id] < levels[pid] + 1) {
+              levels[m.id] = levels[pid] + 1;
+              changed = true;
+            }
+          });
+          m.spouses.forEach(s => {
+            if (s.id && levels[s.id] !== undefined) {
+              const t = Math.max(levels[m.id], levels[s.id]);
+              if (levels[m.id] !== t) { levels[m.id] = t; changed = true; }
+              if (levels[s.id] !== t) { levels[s.id] = t; changed = true; }
+            }
+          });
+          if (m.siblingOfId && levels[m.siblingOfId] !== undefined) {
+            const t = Math.max(levels[m.id], levels[m.siblingOfId]);
+            if (levels[m.id] !== t) { levels[m.id] = t; changed = true; }
+            if (levels[m.siblingOfId] !== t) { levels[m.siblingOfId] = t; changed = true; }
+          }
+        });
+
+        familyMembers.forEach(p => {
+          if (p.fatherId || p.motherId) return;
+          const kids = getChildren(p);
+          if (!kids.length) return;
+          const target = Math.min(...kids.map(k => levels[k.id])) - 1;
+          if (target > levels[p.id]) { levels[p.id] = target; changed = true; }
+        });
+        if (!changed) break;
+      }
+      return levels;
+    }
+
+    // ================= GRAF VIS NETWORK =================
     function initVisNetwork() {
       const container = document.getElementById('tree-canvas');
-      const data = { nodes: visNodes, edges: visEdges };
+      const isTree = currentView === 'tree';
 
       const options = {
-        layout: {
-          hierarchical: {
-            enabled: currentView === 'tree',
-            direction: 'UD',
-            sortMethod: 'directed',
-            nodeSpacing: 260,       
-            levelSeparation: 160,
-            treeSpacing: 240,      
-            blockShifting: true,
-            edgeMinimization: true,
-            parentCentralization: true
-          }
-        },
-        physics: {
+        layout: { hierarchical: false },
+        physics: isTree ? false : {
           enabled: true,
-          solver: currentView === 'tree' ? 'hierarchicalRepulsion' : 'forceAtlas2Based',
-          hierarchicalRepulsion: {
-            centralGravity: 0.0,
-            springLength: 180,
-            springConstant: 0.01,
-            nodeDistance: 220,
-            damping: 0.09
-          },
+          solver: 'forceAtlas2Based',
           forceAtlas2Based: {
-            gravitationalConstant: -100,
-            centralGravity: 0.01,
-            springLength: 150,
-            springConstant: 0.08,
+            gravitationalConstant: -260,
+            centralGravity: 0.008,
+            springLength: 260,
+            springConstant: 0.05,
             avoidOverlap: 1
-          }
+          },
+          stabilization: { iterations: 200 }
         },
-        interaction: { hover: true, zoomView: true, dragView: true },
+        interaction: { hover: true, zoomView: true, dragView: true, tooltipDelay: 250 },
         nodes: {
           shape: 'box',
           margin: { top: 10, bottom: 10, left: 14, right: 14 },
-          borderRadius: 12,
+          shapeProperties: { borderRadius: 12 },
           borderWidth: 2,
-          shadow: {
-            enabled: true,
-            color: 'rgba(0,0,0,0.06)',
-            size: 6,
-            x: 0,
-            y: 2
-          },
-          font: { 
-            face: 'Plus Jakarta Sans',
-            size: 13,
-            align: 'center'
-          }
+          shadow: { enabled: true, color: 'rgba(0,0,0,0.08)', size: 6, x: 0, y: 2 },
+          font: { face: 'Plus Jakarta Sans', size: 13, align: 'center' }
         },
         edges: {
-          smooth: { type: 'cubicBezier', forceDirection: 'vertical', roundness: 0.4 }
+          smooth: isTree
+            ? { type: 'cubicBezier', forceDirection: 'vertical', roundness: 0.4 }
+            : { type: 'dynamic' },
+          hoverWidth: 1.5,
+          selectionWidth: 1.5
         }
       };
 
-      networkGraph = new vis.Network(container, data, options);
+      networkGraph = new vis.Network(container, { nodes: visNodes, edges: visEdges }, options);
+
+      networkGraph.on("hoverNode", () => { container.style.cursor = 'pointer'; });
+      networkGraph.on("blurNode", () => { container.style.cursor = 'default'; });
+      networkGraph.on("hoverEdge", () => { if (isDeletingEdgeMode) container.style.cursor = 'pointer'; });
+      networkGraph.on("blurEdge", () => { container.style.cursor = 'default'; });
 
       networkGraph.on("click", function(params) {
-        if (params.nodes.length > 0) {
+        if (isDeletingEdgeMode && params.edges.length > 0 && params.nodes.length === 0) {
+          const edgeObj = visEdges.get(params.edges[0]);
+          if (edgeObj) {
+            openConfirmModal("Hapus Tali Relasi", "Apakah Anda yakin ingin menghapus hubungan tali ini?", function() {
+              removeRelationshipEdge(edgeObj.from, edgeObj.to);
+            });
+          }
+          return;
+        }
+
+        if (isConnectingMode && params.nodes.length > 0) {
+          const clickedId = params.nodes[0];
+          if (!selectedSourceNodeId) {
+            selectedSourceNodeId = clickedId;
+            const srcObj = byId(clickedId);
+            setBanner(`<i class="fa-solid fa-diagram-next text-neutral-300 mr-2"></i> Terpilih: <b>${escapeHtml(srcObj.name)}</b>. Sekarang klik anggota KEDUA.`);
+            showToast(`Terpilih: ${srcObj.name}. Klik anggota kedua.`);
+          } else if (selectedSourceNodeId !== clickedId) {
+            selectedTargetNodeId = clickedId;
+            const srcObj = byId(selectedSourceNodeId);
+            const tgtObj = byId(selectedTargetNodeId);
+            document.getElementById('edgeTypeModalSub').innerText = `A: ${srcObj.name}  •  B: ${tgtObj.name}`;
+            document.getElementById('edgeTypeModal').classList.remove('hidden');
+          }
+          return;
+        }
+
+        if (!isConnectingMode && !isDeletingEdgeMode && params.nodes.length > 0) {
           openDetailModal(params.nodes[0]);
         }
       });
     }
 
+    function rebuildNetwork() {
+      if (networkGraph) {
+        networkGraph.destroy();
+        networkGraph = null;
+      }
+      initVisNetwork();
+      updateGraphData();
+    }
+
+    function pairLabel(a, b, status = 'active') {
+      let first = a, second = b;
+      if (a.gender === 'P' && b.gender === 'L') { first = b; second = a; }
+      const n1 = first.nickname || first.name.split(' ')[0];
+      const n2 = second.nickname || second.name.split(' ')[0];
+      return status === 'divorced' ? `${n1} & ${n2} (Bercerai)` : `${n1} & ${n2}`;
+    }
+
+    let measureCtx = null;
+    function textWidth(text, bold) {
+      try {
+        if (!measureCtx) measureCtx = document.createElement('canvas').getContext('2d');
+        measureCtx.font = `${bold ? '700' : '500'} 13px 'Plus Jakarta Sans', Arial, sans-serif`;
+        return measureCtx.measureText(text).width;
+      } catch (e) {
+        return text.length * 7.6;
+      }
+    }
+
+    function wrapName(text, maxInner, bold) {
+      const words = text.split(/\s+/).filter(Boolean);
+      const lines = [];
+      let line = '';
+      words.forEach(w => {
+        const test = line ? line + ' ' + w : w;
+        if (!line || textWidth(test, bold) <= maxInner) line = test;
+        else { lines.push(line); line = w; }
+      });
+      if (line) lines.push(line);
+      return lines.length ? lines : [''];
+    }
+
+    function getNodeMetrics(m) {
+      const isMe = m.id === meId;
+      let name = m.name;
+      if (m.nickname && m.nickname !== m.name) name += ` (${m.nickname})`;
+      const nameLines = wrapName(name, 170, isMe);
+      const subtitles = [];
+      if (isMe) subtitles.push('[ SAYA ]');
+      if (!m.isAlive) subtitles.push('(Wafat)');
+      const all = nameLines.concat(subtitles);
+      const maxW = Math.max(...all.map(l => textWidth(l, isMe)));
+      return {
+        nameLines: nameLines,
+        subtitles: subtitles,
+        width: Math.round(Math.min(Math.max(maxW + 40, 120), 260)),
+        height: all.length * 17 + 26
+      };
+    }
+
+    function computeTreeLayout(levels) {
+      const H_GAP = 70;
+      const ROOT_GAP = 140;
+      const V_GAP = 120;
+
+      const metrics = {};
+      familyMembers.forEach(m => { metrics[m.id] = getNodeMetrics(m); });
+
+      const uf = {};
+      familyMembers.forEach(m => { uf[m.id] = m.id; });
+      const find = x => { while (uf[x] !== x) { uf[x] = uf[uf[x]]; x = uf[x]; } return x; };
+      const union = (a, b) => { const ra = find(a), rb = find(b); if (ra !== rb) uf[rb] = ra; };
+      familyMembers.forEach(m => {
+        m.spouses.forEach(s => union(m.id, s.id));
+        if (m.fatherId && m.motherId) union(m.fatherId, m.motherId);
+      });
+      const comp = {};
+      familyMembers.forEach(m => {
+        const r = find(m.id);
+        (comp[r] = comp[r] || []).push(m);
+      });
+
+      const unitOf = {};
+      const units = [];
+      Object.values(comp).forEach(list => {
+        list.sort((a, b) => (a.gender === b.gender ? a.id - b.id : (a.gender === 'L' ? -1 : 1)));
+        const ordered = [];
+        const done = new Set();
+        list.forEach(m => {
+          if (done.has(m.id)) return;
+          ordered.push(m); done.add(m.id);
+          m.spouses.forEach(s => {
+            const sp = list.find(x => x.id === s.id);
+            if (sp && !done.has(sp.id)) { ordered.push(sp); done.add(sp.id); }
+          });
+        });
+        const u = { members: ordered, children: [], parent: null, pseudo: false };
+        ordered.forEach(x => { unitOf[x.id] = u; });
+        units.push(u);
+      });
+
+      units.forEach(u => {
+        for (const mem of u.members) {
+          const pid = mem.fatherId || mem.motherId;
+          const pu = pid ? unitOf[pid] : null;
+          if (pu && pu !== u) { u.parent = pu; pu.children.push(u); break; }
+        }
+      });
+
+      const visited = new Set();
+      const roots = [];
+      function mark(u) {
+        if (visited.has(u)) return;
+        visited.add(u);
+        u.children.forEach(mark);
+      }
+      units.filter(u => !u.parent).forEach(u => { roots.push(u); mark(u); });
+      units.forEach(u => {
+        if (visited.has(u)) return;
+        if (u.parent) {
+          u.parent.children = u.parent.children.filter(c => c !== u);
+          u.parent = null;
+        }
+        roots.push(u);
+        mark(u);
+      });
+
+      const rootSet = new Set(roots);
+      const groupOf = new Map();
+      const groups = [];
+      roots.forEach(u => {
+        u.members.forEach(mem => {
+          const s = mem.siblingOfId ? byId(mem.siblingOfId) : null;
+          const su = s ? unitOf[s.id] : null;
+          if (!su || su === u || !rootSet.has(su)) return;
+          const gu = groupOf.get(u);
+          const gs = groupOf.get(su);
+          if (gu && gs) {
+            if (gu !== gs) {
+              gs.forEach(x => { gu.push(x); groupOf.set(x, gu); });
+              groups.splice(groups.indexOf(gs), 1);
+            }
+          } else if (gu) {
+            gu.push(su); groupOf.set(su, gu);
+          } else if (gs) {
+            gs.push(u); groupOf.set(u, gs);
+          } else {
+            const g = [u, su];
+            groups.push(g);
+            groupOf.set(u, g);
+            groupOf.set(su, g);
+          }
+        });
+      });
+
+      const topLevel = [];
+      const emitted = new Set();
+      roots.forEach(u => {
+        const g = groupOf.get(u);
+        if (!g) topLevel.push(u);
+        else if (!emitted.has(g)) {
+          emitted.add(g);
+          topLevel.push({ members: [], children: g.slice(), parent: null, pseudo: true });
+        }
+      });
+
+      const minId = u => u.members.length ? Math.min(...u.members.map(x => x.id)) : Infinity;
+      const keyOf = u => {
+        const m = u.members.find(x => x.fatherId || x.motherId) || u.members[0];
+        return (m && m.birthDate) || '9999';
+      };
+      const sortKids = arr => arr.sort((a, b) => keyOf(a).localeCompare(keyOf(b)) || minId(a) - minId(b));
+      const treeMinId = u => Math.min(minId(u), ...u.children.map(treeMinId));
+
+      function calc(u) {
+        sortKids(u.children);
+        u.children.forEach(calc);
+        if (u.pseudo) {
+          u.w = 0;
+          u.gaps = [];
+        } else {
+          u.gaps = [];
+          for (let i = 0; i < u.members.length - 1; i++) {
+            const a = u.members[i], b = u.members[i + 1];
+            const spObj = a.spouses.find(s => s.id === b.id);
+            u.gaps.push(spObj ? Math.max(130, pairLabel(a, b, spObj.status).length * 6.5 + 44) : 100);
+          }
+          u.w = u.members.reduce((s, m) => s + metrics[m.id].width, 0) + u.gaps.reduce((s, g) => s + g, 0);
+        }
+        u.kidsW = u.children.reduce((s, c) => s + c.sw, 0) + Math.max(0, u.children.length - 1) * H_GAP;
+        u.sw = Math.max(u.w, u.kidsW);
+      }
+
+      const pos = {};
+      function place(u, left) {
+        const cx = left + u.sw / 2;
+        if (!u.pseudo) {
+          let x = cx - u.w / 2;
+          u.members.forEach((m, i) => {
+            const w = metrics[m.id].width;
+            pos[m.id] = { x: x + w / 2, y: 0 };
+            x += w + (u.gaps[i] || 0);
+          });
+        }
+        let x = cx - u.kidsW / 2;
+        u.children.forEach(c => { place(c, x); x += c.sw + H_GAP; });
+      }
+
+      topLevel.sort((a, b) => treeMinId(a) - treeMinId(b));
+      topLevel.forEach(calc);
+
+      const topOf = new Map();
+      topLevel.forEach(r => {
+        (function walk(u) { topOf.set(u, r); u.children.forEach(walk); })(r);
+      });
+      const containsMe = r => {
+        let found = false;
+        (function walk(u) {
+          if (u.members.some(m => m.id === meId)) found = true;
+          u.children.forEach(walk);
+        })(r);
+        return found;
+      };
+
+      const first = topLevel.find(containsMe) || topLevel[0];
+      let leftEdge = 0;
+      let rightEdge = 0;
+      if (first) {
+        place(first, 0);
+        rightEdge = first.sw;
+      }
+      let remaining = topLevel.filter(r => r !== first);
+      while (remaining.length) {
+        let pick = null;
+        let anchorX = 0;
+        outer:
+        for (const r of remaining) {
+          for (const m of familyMembers) {
+            if (!pos[m.id]) continue;
+            const pid = m.fatherId || m.motherId;
+            const pu = pid ? unitOf[pid] : null;
+            if (pu && topOf.get(pu) === r && topOf.get(unitOf[m.id]) !== r) {
+              pick = r;
+              anchorX = pos[m.id].x;
+              break outer;
+            }
+          }
+        }
+
+        if (pick) {
+          if (anchorX < (leftEdge + rightEdge) / 2) {
+            const left = leftEdge - ROOT_GAP - pick.sw;
+            place(pick, left);
+            leftEdge = left;
+          } else {
+            const left = rightEdge + ROOT_GAP;
+            place(pick, left);
+            rightEdge = left + pick.sw;
+          }
+        } else {
+          pick = remaining[0];
+          const left = rightEdge + ROOT_GAP;
+          place(pick, left);
+          rightEdge = left + pick.sw;
+        }
+        remaining = remaining.filter(r => r !== pick);
+      }
+      const cursor = rightEdge;
+
+      const maxH = {};
+      familyMembers.forEach(m => {
+        const l = levels[m.id] || 0;
+        maxH[l] = Math.max(maxH[l] || 0, metrics[m.id].height);
+      });
+      const lv = Object.keys(maxH).map(Number).sort((a, b) => a - b);
+      const levelY = {};
+      let y = 0, prev = null;
+      lv.forEach(l => {
+        if (prev !== null) y += maxH[prev] / 2 + V_GAP + maxH[l] / 2;
+        levelY[l] = y;
+        prev = l;
+      });
+
+      familyMembers.forEach(m => {
+        if (!pos[m.id]) pos[m.id] = { x: cursor, y: 0 };
+        pos[m.id].y = levelY[levels[m.id] || 0] || 0;
+      });
+      return pos;
+    }
+
+    function nodeStyle(m) {
+      if (m.id === meId) return PALETTE.me;
+      if (!m.isAlive) return PALETTE.dead;
+      return m.gender === 'L' ? PALETTE.male : PALETTE.female;
+    }
 
     function updateGraphData() {
-      visNodes.clear();
-      visEdges.clear();
-
       const nodesArr = [];
       const edgesArr = [];
       const marriageEdges = new Set();
+      const processedChildren = new Set();
+      const nodeLevels = computeGenerationalLevels();
+      const treePos = currentView === 'tree' ? computeTreeLayout(nodeLevels) : null;
 
       familyMembers.forEach(m => {
         const isMe = m.id === meId;
-        const isMale = m.gender === 'L';
+        const st = nodeStyle(m);
 
-        let bgColor = isMale ? '#f3f4f6' : '#f9fafb';
-        let borderColor = isMale ? '#374151' : '#4b5563';
-        let textColor = isMale ? '#1f2937' : '#111827';
+        const met = getNodeMetrics(m);
+        const labelText = met.nameLines.concat(met.subtitles).join('\n');
+        const pos = treePos ? treePos[m.id] : null;
 
-        if (!m.isAlive) {
-          bgColor = '#e5e7eb';
-          borderColor = '#9ca3af';
-          textColor = '#6b7280';
-        }
-
-        if (isMe) {
-          bgColor = '#d1d5db';
-          borderColor = '#171717';
-          textColor = '#0a0a0a';
-        }
-
-        let cleanName = m.name;
-        if (m.nickname && m.nickname !== m.name) {
-          cleanName += ` (${m.nickname})`;
-        }
-
-        let labelText = cleanName;
-        if (isMe) {
-          labelText += "\n[ SAYA ]";
-        }
-        if (!m.isAlive) {
-          labelText += "\n(Wafat)";
-        }
-
-        nodesArr.push({
+        const node = {
           id: m.id,
           label: labelText,
+          widthConstraint: { minimum: met.width - 28, maximum: met.width - 28 },
+          heightConstraint: { minimum: met.height - 20, valign: 'middle' },
           color: {
-            background: bgColor,
-            border: borderColor,
-            highlight: { 
-              background: isMe ? '#9ca3af' : '#ffffff', 
-              border: '#000000' 
-            }
+            background: st.bg,
+            border: st.border,
+            highlight: { background: isMe ? '#404040' : '#d4d4d4', border: '#000000' },
+            hover: { background: isMe ? '#262626' : '#f5f5f5', border: '#000000' }
           },
           borderWidth: isMe ? 3 : 2,
-          font: { color: textColor, bold: isMe ? true : false },
-          opacity: m.isAlive ? 1 : 0.75
-        });
+          shapeProperties: { borderDashes: m.isAlive ? false : [4, 4], borderRadius: 12 },
+          font: { color: st.text, bold: isMe }
+        };
+        if (pos) { node.x = pos.x; node.y = pos.y; }
+        nodesArr.push(node);
+      });
 
-        if (m.fatherId) {
-          edgesArr.push({
-            from: m.fatherId,
-            to: m.id,
-            arrows: 'to',
-            color: { color: '#171717' },
-            width: 2
-          });
-        }
-        if (m.motherId && m.motherId !== m.fatherId) {
-          edgesArr.push({
-            from: m.motherId,
-            to: m.id,
-            arrows: 'to',
-            color: { color: '#4b5563' },
-            width: 2
-          });
+      familyMembers.forEach(m => {
+        m.spouses.forEach(s => {
+          const pairKey = [m.id, s.id].sort((a, b) => a - b).join('_');
+          const spouseObj = byId(s.id);
+
+          if (spouseObj && !marriageEdges.has(pairKey)) {
+            marriageEdges.add(pairKey);
+
+            const isDivorced = s.status === 'divorced';
+            edgesArr.push({
+              id: `p_${pairKey}`,
+              from: m.id,
+              to: s.id,
+              label: pairLabel(m, spouseObj, s.status),
+              font: { align: 'horizontal', size: 10, color: isDivorced ? '#737373' : '#171717', strokeWidth: 4, strokeColor: '#ffffff' },
+              dashes: isDivorced ? [2, 4] : [6, 5],
+              smooth: false,
+              color: { color: isDivorced ? PALETTE.marriageDivorced : PALETTE.marriage, highlight: '#000000' },
+              width: isDivorced ? 1.5 : 2.5,
+              title: `Pernikahan: ${m.name} & ${spouseObj.name} (${isDivorced ? 'Bercerai' : 'Aktif'})`
+            });
+
+            const commonChildren = familyMembers.filter(c => 
+              (c.fatherId === m.id && c.motherId === spouseObj.id) ||
+              (c.fatherId === spouseObj.id && c.motherId === m.id)
+            );
+
+            commonChildren.forEach(child => {
+              processedChildren.add(child.id);
+              const parentId = m.gender === 'L' ? m.id : spouseObj.id;
+              edgesArr.push({
+                id: `c_${pairKey}_${child.id}`,
+                from: parentId,
+                to: child.id,
+                arrows: 'to',
+                color: { color: PALETTE.fatherEdge },
+                width: 2.5
+              });
+            });
+          }
+        });
+      });
+
+      familyMembers.forEach(m => {
+        if (!processedChildren.has(m.id)) {
+          if (m.fatherId) {
+            edgesArr.push({
+              id: `f_${m.fatherId}_${m.id}`,
+              from: m.fatherId,
+              to: m.id,
+              arrows: 'to',
+              color: { color: PALETTE.fatherEdge },
+              width: 2.5
+            });
+          } else if (m.motherId) {
+            edgesArr.push({
+              id: `m_${m.motherId}_${m.id}`,
+              from: m.motherId,
+              to: m.id,
+              arrows: 'to',
+              color: { color: PALETTE.motherEdge },
+              width: 2.5
+            });
+          }
         }
 
         if (m.siblingOfId && !m.fatherId && !m.motherId) {
           edgesArr.push({
+            id: `s_${m.siblingOfId}_${m.id}`,
             from: m.siblingOfId,
             to: m.id,
             dashes: [2, 4],
-            color: { color: '#6b7280' },
+            color: { color: PALETTE.sibling },
             width: 2,
-            title: m.siblingOrder || 'Saudara kandung'
+            title: m.siblingOrder ? `${m.siblingOrder}` : 'Saudara kandung'
           });
-        }
-
-        if (m.spouseId) {
-          const pairKey = [m.id, m.spouseId].sort().join('_');
-          if (!marriageEdges.has(pairKey)) {
-            marriageEdges.add(pairKey);
-            edgesArr.push({
-              from: m.id,
-              to: m.spouseId,
-              dashes: [4, 4],
-              color: { color: '#4b5563' },
-              width: 2,
-              title: 'Pasangan Pernikahan'
-            });
-          }
         }
       });
 
+      visNodes.clear();
+      visEdges.clear();
       visNodes.add(nodesArr);
       visEdges.add(edgesArr);
 
-      setTimeout(() => { if (networkGraph) networkGraph.fit(); }, 200);
+      setTimeout(() => { if (networkGraph) networkGraph.fit(); }, 250);
+      if (networkGraph && currentView === 'network') {
+        networkGraph.once('stabilized', () => networkGraph.fit());
+      }
     }
 
     function renderCardsView() {
       const container = document.getElementById('cards-view');
-      container.innerHTML = familyMembers.map(m => {
+      const levels = computeGenerationalLevels();
+      const sorted = [...familyMembers].sort((a, b) => (levels[a.id] - levels[b.id]) || a.name.localeCompare(b.name, 'id'));
+
+      container.innerHTML = sorted.map(m => {
         const isMe = m.id === meId;
-        const safePhoto = m.photoUrl || getDefaultAvatarSVG(m.gender);
-        const safeName = escapeHtml(m.name);
-        const safeJob = escapeHtml(m.job || 'Pekerjaan -');
         return `
-          <div onclick="openDetailModal(${m.id})" class="bg-white rounded-2xl p-3 border ${isMe ? 'border-neutral-900 ring-2 ring-gray-300' : 'border-neutral-200'} shadow-sm hover:shadow transition cursor-pointer relative flex items-center gap-3">
-            ${isMe ? '<span class="absolute top-2.5 right-2.5 bg-gray-400 text-neutral-950 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full">[SAYA]</span>' : ''}
-            <img src="${safePhoto}" onerror="this.src=getDefaultAvatarSVG('${m.gender}')" class="w-11 h-11 rounded-xl bg-neutral-100 object-cover flex-shrink-0 border border-neutral-300">
+          <div onclick="openDetailModal(${m.id})" class="bg-white rounded-2xl p-3 border ${isMe ? 'border-neutral-900 ring-2 ring-neutral-300' : 'border-neutral-200'} shadow-sm hover:shadow transition cursor-pointer relative flex items-center gap-3">
+            ${isMe ? '<span class="absolute top-2.5 right-2.5 bg-neutral-900 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-full">SAYA</span>' : ''}
+            <img src="${escapeHtml(photoOf(m))}" alt="" onerror="this.onerror=null;this.src=getDefaultAvatarSVG('${m.gender}')" class="w-11 h-11 rounded-xl bg-neutral-100 object-cover flex-shrink-0 border border-neutral-300">
             <div class="min-w-0 flex-1">
-              <h4 class="font-bold text-xs text-neutral-800 truncate">${safeName}</h4>
-              <p class="text-[10px] text-neutral-500">${m.gender === 'L' ? 'Laki-Laki' : 'Perempuan'} ${!m.isAlive ? '(Wafat)' : ''}</p>
-              <p class="text-[10px] text-gray-700 font-semibold truncate">${safeJob}</p>
+              <h4 class="font-bold text-xs text-neutral-800 truncate ${isMe ? 'pr-10' : ''}">${escapeHtml(m.name)}</h4>
+              <p class="text-[10px] text-neutral-500">${m.gender === 'L' ? 'Laki-Laki' : 'Perempuan'} ${!m.isAlive ? '(Wafat)' : ''} • Gen ${levels[m.id] + 1}</p>
+              <p class="text-[10px] text-neutral-700 font-semibold truncate">${escapeHtml(m.job || 'Pekerjaan -')}</p>
             </div>
           </div>
         `;
@@ -1079,77 +2398,161 @@
 
     function switchView(view) {
       currentView = view;
-      const btnTree = document.getElementById('btnViewTree');
-      const btnNet = document.getElementById('btnViewNetwork');
-      const btnCards = document.getElementById('btnViewCards');
-      const cardsView = document.getElementById('cards-view');
+      exitSpecialCanvasModes();
 
-      [btnTree, btnNet, btnCards].forEach(b => {
-        b.className = "px-3 py-1 rounded-lg text-xs font-semibold text-neutral-600 transition hover:text-neutral-900";
+      const buttons = { tree: 'btnViewTree', network: 'btnViewNetwork', cards: 'btnViewCards' };
+      Object.entries(buttons).forEach(([key, id]) => {
+        document.getElementById(id).className = key === view
+          ? "px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm bg-neutral-900 text-white"
+          : "px-3 py-1 rounded-lg text-xs font-semibold text-neutral-600 transition hover:text-neutral-900";
       });
 
-      if (view === 'cards') {
-        btnCards.className = "px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm bg-neutral-900 text-white";
-        cardsView.classList.remove('hidden');
-      } else {
-        cardsView.classList.add('hidden');
-        if (view === 'tree') {
-          btnTree.className = "px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm bg-neutral-900 text-white";
-        } else {
-          btnNet.className = "px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm bg-neutral-900 text-white";
-        }
+      const isCards = view === 'cards';
+      document.getElementById('cards-view').classList.toggle('hidden', !isCards);
+      document.getElementById('graphZoomControls').classList.toggle('hidden', isCards);
+      document.getElementById('canvasHint').classList.toggle('hidden', isCards);
 
-        networkGraph.setOptions({
-          layout: { hierarchical: { enabled: view === 'tree' } },
-          physics: { 
-            enabled: true,
-            solver: view === 'tree' ? 'hierarchicalRepulsion' : 'forceAtlas2Based'
-          }
-        });
-        updateGraphData();
-      }
+      if (!isCards) rebuildNetwork();
     }
 
     function zoomGraph(factor) {
-      if (networkGraph) {
-        const scale = networkGraph.getScale();
-        networkGraph.moveTo({ scale: scale + factor });
-      }
+      if (!networkGraph) return;
+      const scale = Math.max(0.2, networkGraph.getScale() + factor);
+      networkGraph.moveTo({ scale: scale, animation: { duration: 200 } });
     }
 
     function fitGraph() {
-      if (networkGraph) networkGraph.fit();
+      if (networkGraph) networkGraph.fit({ animation: { duration: 300 } });
+    }
+
+    // ================= MODE PILIH BANYAK =================
+    function toggleMultiConnectMode() {
+      isMultiConnectMode = !isMultiConnectMode;
+      const btn = document.getElementById('btnToggleMultiMode');
+
+      document.getElementById('singleRelationBox').classList.toggle('hidden', isMultiConnectMode);
+      document.getElementById('multiRelationBox').classList.toggle('hidden', !isMultiConnectMode);
+
+      if (isMultiConnectMode) {
+        btn.innerHTML = `<i class="fa-solid fa-arrow-left mr-1"></i> Mode Single`;
+        btn.className = "text-[10px] font-bold text-white bg-neutral-900 px-2 py-0.5 rounded-lg transition border border-neutral-700 flex-shrink-0";
+        renderMultiPickList();
+      } else {
+        btn.innerHTML = `<i class="fa-solid fa-list-check mr-1"></i> Mode Pilih Banyak (Anak/Adik)`;
+        btn.className = "text-[10px] font-bold text-neutral-800 bg-neutral-200 hover:bg-neutral-300 px-2 py-0.5 rounded-lg transition border border-neutral-300 flex-shrink-0";
+      }
+    }
+
+    function setMultiFilter(type) {
+      multiFilterType = type;
+      const on = "px-2 py-0.5 rounded-lg text-[10px] font-bold bg-neutral-800 text-white";
+      const off = "px-2 py-0.5 rounded-lg text-[10px] font-bold bg-neutral-200 text-neutral-800 hover:bg-neutral-300";
+      document.getElementById('btnFilterAll').className = type === 'all' ? on : off;
+      document.getElementById('btnFilterUnrelated').className = type === 'unrelated' ? on : off;
+      renderMultiPickList();
+    }
+
+    function hasNoRelations(m) {
+      return !m.fatherId && !m.motherId && (!m.spouses || m.spouses.length === 0) && !m.siblingOfId && getChildren(m).length === 0 &&
+             !familyMembers.some(o => o.siblingOfId === m.id);
+    }
+
+    function renderMultiPickList() {
+      const container = document.getElementById('multiPickListContainer');
+      const query = document.getElementById('multiSearchInput').value.toLowerCase().trim();
+
+      const checked = new Set(Array.from(document.querySelectorAll('input[name="multiPickMembers"]:checked')).map(cb => cb.value));
+
+      const filtered = familyMembers.filter(m => {
+        if (m.id === currentModalExcludeId) return false;
+        if (multiFilterType === 'unrelated' && !hasNoRelations(m)) return false;
+        if (!query) return true;
+        return m.name.toLowerCase().includes(query) || (m.nickname && m.nickname.toLowerCase().includes(query));
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="text-center py-4 text-neutral-400 text-xs">Tidak ada anggota keluarga ditemukan</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(m => `
+        <label class="flex items-center justify-between p-1.5 hover:bg-neutral-50 rounded-lg cursor-pointer border border-neutral-100">
+          <div class="flex items-center gap-2 min-w-0">
+            <input type="checkbox" name="multiPickMembers" value="${m.id}" ${checked.has(String(m.id)) ? 'checked' : ''} class="rounded border-neutral-300 text-neutral-900 focus:ring-neutral-400">
+            <span class="font-bold text-neutral-800 text-xs truncate">${escapeHtml(m.name)}</span>
+          </div>
+          ${hasNoRelations(m)
+            ? '<span class="text-[9px] bg-neutral-900 text-white font-bold px-1.5 py-0.5 rounded-md flex-shrink-0">Belum Berelasi</span>'
+            : '<span class="text-[9px] text-neutral-400 flex-shrink-0">Punya Relasi</span>'}
+        </label>
+      `).join('');
+    }
+
+    function selectAllUnrelated() {
+      document.querySelectorAll('input[name="multiPickMembers"]').forEach(cb => {
+        const m = byId(parseInt(cb.value));
+        if (m && hasNoRelations(m)) cb.checked = true;
+      });
+    }
+
+    // ================= FORM ANGGOTA =================
+    function resetMemberFormUI() {
+      document.getElementById('memberForm').reset();
+      document.getElementById('targetSearchInput').value = "";
+      document.getElementById('multiSearchInput').value = "";
+      clearUploadedFormPhoto();
+
+      isMultiConnectMode = false;
+      multiFilterType = 'all';
+      setMultiFilter('all');
+      document.getElementById('singleRelationBox').classList.remove('hidden');
+      document.getElementById('multiRelationBox').classList.add('hidden');
+      document.getElementById('spouseStatusContainer').classList.add('hidden');
+      const btn = document.getElementById('btnToggleMultiMode');
+      btn.innerHTML = `<i class="fa-solid fa-list-check mr-1"></i> Mode Pilih Banyak (Anak/Adik)`;
+      btn.className = "text-[10px] font-bold text-neutral-800 bg-neutral-200 hover:bg-neutral-300 px-2 py-0.5 rounded-lg transition border border-neutral-300 flex-shrink-0";
+    }
+
+    function toggleSpouseStatusOption() {
+      const relType = document.getElementById('relationType').value;
+      document.getElementById('spouseStatusContainer').classList.toggle('hidden', relType !== 'spouse');
     }
 
     function openAddMemberModal(targetId = meId, defaultRelation = 'child') {
       if (!isEditMode) return;
 
-      const modal = document.getElementById('memberModal');
-      document.getElementById('memberForm').reset();
+      resetMemberFormUI();
       document.getElementById('formMemberId').value = "";
-      clearUploadedFormPhoto();
-      document.getElementById('memberModalTitle').innerHTML = `<i class="fa-solid fa-user-plus text-gray-400"></i> Tambah Kerabat Keluarga`;
-      document.getElementById('relationSelectGroup').classList.remove('hidden');
+      document.getElementById('memberModalTitle').innerHTML = `<i class="fa-solid fa-user-plus text-neutral-300"></i> Tambah Kerabat Keluarga`;
 
+      currentModalExcludeId = null;
       populateTargetMembers(targetId);
-      updateRelationOptions(defaultRelation);
-      toggleDeathDate();
+      updateRelationOptions(defaultRelation, false);
 
-      modal.classList.remove('hidden');
+      if (defaultRelation === 'father') document.getElementById('formGender').value = 'L';
+      if (defaultRelation === 'mother') document.getElementById('formGender').value = 'P';
+
+      toggleDeathDate();
+      toggleSpouseStatusOption();
+      document.getElementById('memberModal').classList.remove('hidden');
     }
 
     function openEditMemberModal(id) {
       if (!isEditMode) return;
 
-      const member = familyMembers.find(m => m.id === id);
+      const member = byId(id);
       if (!member) return;
 
-      const modal = document.getElementById('memberModal');
-      document.getElementById('memberForm').reset();
-      clearUploadedFormPhoto();
+      resetMemberFormUI();
       document.getElementById('formMemberId').value = member.id;
-      document.getElementById('memberModalTitle').innerHTML = `<i class="fa-solid fa-user-pen text-gray-400"></i> Edit Profil Anggota`;
-      document.getElementById('relationSelectGroup').classList.add('hidden');
+      document.getElementById('memberModalTitle').innerHTML = `<i class="fa-solid fa-user-pen text-neutral-300"></i> Edit Profil Anggota`;
+
+      let defaultTargetId = (member.spouses[0] && member.spouses[0].id) || member.fatherId || member.motherId || member.siblingOfId || meId;
+      if (defaultTargetId === member.id) defaultTargetId = null;
+
+      currentModalExcludeId = member.id;
+      populateTargetMembers(defaultTargetId, member.id);
+      updateRelationOptions('', true);
 
       document.getElementById('formFullName').value = member.name;
       document.getElementById('formNickname').value = member.nickname || "";
@@ -1159,13 +2562,13 @@
       document.getElementById('formDeathDate').value = member.deathDate || "";
       document.getElementById('formBirthPlace').value = member.birthPlace || "";
       document.getElementById('formJob').value = member.job || "";
-      
-      if (member.photoUrl && member.photoUrl.startsWith('data:image')) {
+
+      if (member.photoUrl && member.photoUrl.startsWith('data:image') && !isDefaultAvatar(member.photoUrl)) {
         document.getElementById('formPhotoData').value = member.photoUrl;
         document.getElementById('formPhotoPreviewImg').src = member.photoUrl;
         document.getElementById('formPhotoPreviewContainer').classList.remove('hidden');
-      } else {
-        document.getElementById('formPhotoUrl').value = member.photoUrl || "";
+      } else if (!isDefaultAvatar(member.photoUrl)) {
+        document.getElementById('formPhotoUrl').value = member.photoUrl;
       }
 
       document.getElementById('formPhone').value = member.phone || "";
@@ -1174,7 +2577,7 @@
 
       toggleDeathDate();
       closeDetailModal();
-      modal.classList.remove('hidden');
+      document.getElementById('memberModal').classList.remove('hidden');
     }
 
     function openEditMeModal() {
@@ -1185,24 +2588,45 @@
       document.getElementById('memberModal').classList.add('hidden');
     }
 
-    function populateTargetMembers(selectedId) {
+    function populateTargetMembers(selectedId = null, excludeId = null, filterQuery = '') {
       const select = document.getElementById('targetMemberId');
-      select.innerHTML = familyMembers.map(m => `
+      const query = filterQuery.toLowerCase().trim();
+
+      const filtered = familyMembers.filter(m => {
+        if (m.id === excludeId) return false;
+        if (!query) return true;
+        return m.name.toLowerCase().includes(query) || (m.nickname && m.nickname.toLowerCase().includes(query));
+      });
+
+      if (filtered.length === 0) {
+        select.innerHTML = `<option value="">-- Nama tidak ditemukan --</option>`;
+        return;
+      }
+
+      select.innerHTML = filtered.map(m => `
         <option value="${m.id}" ${m.id === selectedId ? 'selected' : ''}>${escapeHtml(m.name)} (${m.id === meId ? 'SAYA' : m.gender})</option>
       `).join('');
     }
 
-    function updateRelationOptions(preset = null) {
+    function filterTargetMembers() {
+      const query = document.getElementById('targetSearchInput').value;
+      const currentSelected = parseInt(document.getElementById('targetMemberId').value);
+      populateTargetMembers(currentSelected, currentModalExcludeId, query);
+    }
+
+    function updateRelationOptions(preset = null, allowNoChange = false) {
       const select = document.getElementById('relationType');
-      let options = [
+      const options = [];
+      if (allowNoChange) options.push({ value: '', label: '— Jangan ubah relasi —' });
+      options.push(
+        { value: 'spouse', label: 'Pasangan (Suami/Istri)' },
         { value: 'father', label: 'Ayah' },
         { value: 'mother', label: 'Ibu' },
-        { value: 'spouse', label: 'Pasangan (Suami/Istri)' },
         { value: 'child', label: 'Anak' },
         { value: 'olderSibling', label: 'Kakak (lebih tua)' },
         { value: 'youngerSibling', label: 'Adik (lebih muda)' },
-        { value: 'sibling', label: 'Saudara Kandung (urutan belum ditentukan)' }
-      ];
+        { value: 'sibling', label: 'Saudara Kandung' }
+      );
 
       select.innerHTML = options.map(o => `
         <option value="${o.value}" ${preset === o.value ? 'selected' : ''}>${o.label}</option>
@@ -1211,12 +2635,7 @@
 
     function toggleDeathDate() {
       const isAlive = document.getElementById('formIsAlive').value === "true";
-      const container = document.getElementById('deathDateContainer');
-      if (isAlive) {
-        container.classList.add('hidden');
-      } else {
-        container.classList.remove('hidden');
-      }
+      document.getElementById('deathDateContainer').classList.toggle('hidden', isAlive);
     }
 
     function saveMemberForm(e) {
@@ -1224,125 +2643,187 @@
 
       const editId = document.getElementById('formMemberId').value;
       const fullName = document.getElementById('formFullName').value.trim();
+      if (!fullName) return;
+
       const nickname = document.getElementById('formNickname').value.trim();
-      const gender = document.getElementById('formGender').value;
+      let gender = document.getElementById('formGender').value;
       const isAlive = document.getElementById('formIsAlive').value === "true";
       const birthDate = document.getElementById('formBirthDate').value;
       const deathDate = isAlive ? "" : document.getElementById('formDeathDate').value;
-      const birthPlace = document.getElementById('formBirthPlace').value.trim();
-      const job = document.getElementById('formJob').value.trim();
-      
-      const uploadedDataPhoto = document.getElementById('formPhotoData').value;
-      const photoUrlInput = document.getElementById('formPhotoUrl').value.trim();
-      const finalPhoto = uploadedDataPhoto || photoUrlInput || getDefaultAvatarSVG(gender);
 
-      const phone = document.getElementById('formPhone').value.trim();
-      const address = document.getElementById('formAddress').value.trim();
-      const notes = document.getElementById('formNotes').value.trim();
+      if (birthDate && deathDate && deathDate < birthDate) {
+        showToast("Tanggal wafat tidak boleh sebelum tanggal lahir!", "error");
+        return;
+      }
+
+      const relation = isMultiConnectMode ? '' : document.getElementById('relationType').value;
+      const spouseStatus = document.getElementById('spouseRelationStatus').value;
+
+      if (relation === 'father') gender = 'L';
+      if (relation === 'mother') gender = 'P';
+
+      const finalPhoto = document.getElementById('formPhotoData').value ||
+                         document.getElementById('formPhotoUrl').value.trim() || "";
+
+      const fields = {
+        name: fullName,
+        nickname: nickname,
+        gender: gender,
+        isAlive: isAlive,
+        birthDate: birthDate,
+        deathDate: deathDate,
+        birthPlace: document.getElementById('formBirthPlace').value.trim(),
+        job: document.getElementById('formJob').value.trim(),
+        photoUrl: finalPhoto,
+        phone: document.getElementById('formPhone').value.trim(),
+        address: document.getElementById('formAddress').value.trim(),
+        notes: document.getElementById('formNotes').value.trim()
+      };
+
+      let currentMember = null;
+      let isNew = false;
 
       if (editId) {
-        const id = parseInt(editId);
-        const index = familyMembers.findIndex(m => m.id === id);
-        if (index !== -1) {
-          familyMembers[index] = {
-            ...familyMembers[index],
-            name: fullName,
-            nickname: nickname,
-            gender: gender,
-            isAlive: isAlive,
-            birthDate: birthDate,
-            deathDate: deathDate,
-            birthPlace: birthPlace,
-            job: job,
-            photoUrl: finalPhoto,
-            phone: phone,
-            address: address,
-            notes: notes
-          };
-          showToast("Data profil berhasil diperbarui!");
-        }
+        currentMember = byId(parseInt(editId));
+        if (currentMember) Object.assign(currentMember, fields);
       } else {
-        const targetId = parseInt(document.getElementById('targetMemberId').value);
-        const relation = document.getElementById('relationType').value;
-        const target = familyMembers.find(m => m.id === targetId);
-
+        isNew = true;
         const newId = familyMembers.length > 0 ? Math.max(...familyMembers.map(m => m.id)) + 1 : 1;
-
-        const newMember = {
+        currentMember = Object.assign({
           id: newId,
           isMe: false,
-          name: fullName,
-          nickname: nickname,
-          gender: gender,
-          isAlive: isAlive,
-          birthDate: birthDate,
-          deathDate: deathDate,
-          birthPlace: birthPlace,
-          job: job,
-          photoUrl: finalPhoto,
-          phone: phone,
-          address: address,
-          notes: notes,
           fatherId: null,
           motherId: null,
-          spouseId: null,
-          childrenIds: [],
-          siblingOrder: null
-        };
+          spouses: [],
+          siblingOfId: null,
+          siblingOrder: null,
+          childrenIds: []
+        }, fields);
+      }
 
-        if (relation === 'father') {
-          target.fatherId = newId;
-          newMember.childrenIds.push(target.id);
-        } else if (relation === 'mother') {
-          target.motherId = newId;
-          newMember.childrenIds.push(target.id);
-        } else if (relation === 'spouse') {
-          target.spouseId = newId;
-          newMember.spouseId = target.id;
-        } else if (relation === 'child') {
-          if (target.gender === 'L') newMember.fatherId = target.id;
-          if (target.gender === 'P') newMember.motherId = target.id;
-          if (target.spouseId) {
-            const spouse = familyMembers.find(m => m.id === target.spouseId);
-            if (spouse && spouse.gender === 'P') newMember.motherId = spouse.id;
-            if (spouse && spouse.gender === 'L') newMember.fatherId = spouse.id;
-            if (spouse && !spouse.childrenIds.includes(newId)) spouse.childrenIds.push(newId);
+      if (currentMember) {
+        let relationSuccess = true;
+
+        if (isMultiConnectMode) {
+          if (isNew) familyMembers.push(currentMember);
+          const multiRelType = document.getElementById('multiRelationType').value;
+          document.querySelectorAll('input[name="multiPickMembers"]:checked').forEach(cb => {
+            const picked = byId(parseInt(cb.value));
+            if (!picked || picked.id === currentMember.id) return;
+            applyRelationToMembers(picked, currentMember, multiRelType === 'children' ? 'child' : 'sibling');
+          });
+        } else if (relation) {
+          const target = byId(parseInt(document.getElementById('targetMemberId').value));
+          if (target && target.id !== currentMember.id) {
+            relationSuccess = applyRelationToMembers(currentMember, target, relation, spouseStatus);
           }
-          target.childrenIds.push(newId);
-        } else if (relation === 'sibling' || relation === 'olderSibling' || relation === 'youngerSibling') {
-          newMember.fatherId = target.fatherId || null;
-          newMember.motherId = target.motherId || null;
-          newMember.siblingOrder = relation === 'olderSibling' ? 'Kakak' :
-                                   relation === 'youngerSibling' ? 'Adik' : null;
-          newMember.siblingOfId = target.id;
+          if (relationSuccess && isNew) {
+            familyMembers.push(currentMember);
+          }
+        } else {
+          if (isNew) familyMembers.push(currentMember);
         }
 
-        familyMembers.push(newMember);
-        showToast("Anggota kerabat berhasil ditambahkan!");
+        if (!relationSuccess && isNew) {
+          return;
+        }
       }
 
       saveData();
       renderAll();
       closeMemberModal();
+      showToast("Data silsilah berhasil disimpan!");
+    }
+
+    // ================= DETAIL & SILSILAH BERANTAI =================
+    function buildGenealogyChain(member) {
+      const chains = [];
+
+      const clickable = (m, label) => {
+        if (!m) return '';
+        return `
+          <div class="flex items-center justify-between p-1.5 bg-white border border-neutral-200 rounded-xl hover:border-neutral-900 cursor-pointer transition" onclick="openDetailModal(${m.id})">
+            <span class="text-neutral-500 font-semibold text-[10px] uppercase flex-shrink-0">${label}:</span>
+            <span class="font-bold text-neutral-900 text-xs truncate ml-2">${escapeHtml(m.name)} ${m.id === meId ? '<span class="text-[9px] bg-neutral-900 text-white px-1 rounded">SAYA</span>' : ''}</span>
+          </div>
+        `;
+      };
+      const emptyCell = (txt) => `<div class="p-1.5 text-neutral-400 text-[10px] italic">${txt}: -</div>`;
+      const block = (title, inner, strong) => `<div class="space-y-1"><span class="font-bold ${strong ? 'text-neutral-900' : 'text-neutral-400'} text-[9px] uppercase">${title}</span><div class="grid grid-cols-2 gap-1.5">${inner}</div></div>`;
+
+      const father = byId(member.fatherId);
+      const mother = byId(member.motherId);
+
+      if (father || mother) {
+        chains.push(block('Orang Tua Langsung:',
+          (clickable(father, 'Ayah') || emptyCell('Ayah')) + (clickable(mother, 'Ibu') || emptyCell('Ibu'))));
+      }
+
+      [[father, 'Sisi Ayah'], [mother, 'Sisi Ibu']].forEach(([parent, side]) => {
+        if (!parent) return;
+        const gf = byId(parent.fatherId);
+        const gm = byId(parent.motherId);
+        if (gf || gm) {
+          chains.push(block(`Kakek & Nenek (${side}):`,
+            (clickable(gf, 'Kakek') || emptyCell('Kakek')) + (clickable(gm, 'Nenek') || emptyCell('Nenek'))));
+        }
+      });
+
+      if (member.spouses && member.spouses.length > 0) {
+        const spouseItems = member.spouses.map(s => {
+          const sp = byId(s.id);
+          if (!sp) return '';
+          const label = (sp.gender === 'L' ? 'Suami' : 'Istri') + (s.status === 'divorced' ? ' (Mantan)' : '');
+          return clickable(sp, label);
+        }).join('');
+        chains.push(block('Riwayat Pasangan:', spouseItems, true));
+      }
+
+      // KETURUNAN 17 GENERASI OTOMATIS
+      const descendantsMap = getDescendantsByLevel(member, 17);
+      Object.keys(descendantsMap).forEach(levelStr => {
+        const level = parseInt(levelStr);
+        const list = descendantsMap[level];
+        const titleIndo = GENTREE_DOWN_INDO[level - 1] || `Keturunan Gen-${level}`;
+        const titleAceh = GENTREE_DOWN_ACEH[level - 1] || `Cahèe Gen-${level}`;
+
+        if (list && list.length > 0) {
+          chains.push(block(
+            `Generasi -${level} : ${titleIndo} / ${titleAceh} (${list.length}):`,
+            list.map(item => clickable(item, titleIndo)).join('')
+          ));
+        }
+      });
+
+      const siblings = familyMembers.filter(m => m.id !== member.id && (
+        (m.fatherId && m.fatherId === member.fatherId) ||
+        (m.motherId && m.motherId === member.motherId) ||
+        m.siblingOfId === member.id || member.siblingOfId === m.id));
+      if (siblings.length > 0) {
+        chains.push(block(`Saudara Kandung (${siblings.length}):`,
+          siblings.map(s => clickable(s, s.siblingOrder && s.siblingOfId === member.id ? s.siblingOrder : 'Saudara')).join('')));
+      }
+
+      if (chains.length === 0) {
+        return `<p class="text-neutral-400 italic text-center py-2">Belum ada garis relasi terhubung.</p>`;
+      }
+      return chains.join('<hr class="border-neutral-200 my-1">');
     }
 
     function openDetailModal(id) {
-      const member = familyMembers.find(m => m.id === id);
+      const member = byId(id);
       if (!member) return;
 
       const isMe = member.id === meId;
-      const modal = document.getElementById('detailModal');
 
-      document.getElementById('detailAvatar').src = member.photoUrl || getDefaultAvatarSVG(member.gender);
-      
-      const crown = document.getElementById('detailBadgeCrown');
-      if (isMe) crown.classList.remove('hidden'); else crown.classList.add('hidden');
+      document.getElementById('detailAvatar').src = photoOf(member);
+      document.getElementById('detailBadgeCrown').classList.toggle('hidden', !isMe);
 
       document.getElementById('detailName').innerText = member.name + (member.nickname ? ` (${member.nickname})` : '');
       document.getElementById('detailRelationBadge').innerText = isMe ? 'PUSAT SILSILAH (SAYA)' : (member.gender === 'L' ? 'Laki-Laki' : 'Perempuan');
 
       document.getElementById('detailGender').innerText = member.gender === 'L' ? 'Laki-Laki' : 'Perempuan';
-      document.getElementById('detailStatus').innerText = member.isAlive ? 'Masih Hidup' : `Wafat ${member.deathDate ? '('+member.deathDate+')' : ''}`;
+      document.getElementById('detailStatus').innerText = member.isAlive ? 'Masih Hidup' : `Wafat ${member.deathDate ? '(' + member.deathDate + ')' : ''}`;
 
       let birthStr = member.birthDate || '-';
       if (member.birthPlace) birthStr = `${member.birthPlace}, ${birthStr}`;
@@ -1353,52 +2834,28 @@
       document.getElementById('detailAddress').innerText = member.address || '-';
       document.getElementById('detailNotes').innerText = member.notes || 'Tidak ada catatan.';
 
+      document.getElementById('genealogyChainBox').innerHTML = buildGenealogyChain(member);
+
       const quickAddSection = document.getElementById('quickAddSection');
       const detailModalActions = document.getElementById('detailModalActions');
+      quickAddSection.classList.toggle('hidden', !isEditMode);
+      detailModalActions.classList.toggle('hidden', !isEditMode);
 
-      if (!isEditMode) {
-        quickAddSection.classList.add('hidden');
-        detailModalActions.classList.add('hidden');
-      } else {
-        quickAddSection.classList.remove('hidden');
-        detailModalActions.classList.remove('hidden');
+      if (isEditMode) {
+        const btnClass = "p-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-lg text-[10px] font-bold border border-neutral-300";
+        const quick = [['child', '+ Anak'], ['spouse', '+ Pasangan'], ['father', '+ Ayah'], ['mother', '+ Ibu'], ['olderSibling', '+ Kakak'], ['youngerSibling', '+ Adik']];
+        document.getElementById('quickAddButtons').innerHTML = quick.map(([rel, label]) =>
+          `<button onclick="closeDetailModal(); openAddMemberModal(${member.id}, '${rel}')" class="${btnClass}">${label}</button>`
+        ).join('');
 
-        const quickAdd = document.getElementById('quickAddButtons');
-        quickAdd.innerHTML = `
-          <button onclick="closeDetailModal(); openAddMemberModal(${member.id}, 'child')" class="p-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-lg text-[10px] font-bold border border-neutral-300">
-            + Anak
-          </button>
-          <button onclick="closeDetailModal(); openAddMemberModal(${member.id}, 'spouse')" class="p-1.5 bg-gray-100 hover:bg-gray-200 text-neutral-900 rounded-lg text-[10px] font-bold border border-gray-300">
-            + Pasangan
-          </button>
-          <button onclick="closeDetailModal(); openAddMemberModal(${member.id}, 'father')" class="p-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-lg text-[10px] font-bold border border-neutral-300">
-            + Ayah
-          </button>
-          <button onclick="closeDetailModal(); openAddMemberModal(${member.id}, 'mother')" class="p-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-lg text-[10px] font-bold border border-neutral-300">
-            + Ibu
-          </button>
-          <button onclick="closeDetailModal(); openAddMemberModal(${member.id}, 'olderSibling')" class="p-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-lg text-[10px] font-bold border border-neutral-300">
-            + Kakak
-          </button>
-          <button onclick="closeDetailModal(); openAddMemberModal(${member.id}, 'youngerSibling')" class="p-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-900 rounded-lg text-[10px] font-bold border border-neutral-300">
-            + Adik
-          </button>
-        `;
-
-        document.getElementById('btnEditMember').onclick = function() {
-          openEditMemberModal(member.id);
-        };
+        document.getElementById('btnEditMember').onclick = function() { openEditMemberModal(member.id); };
 
         const btnDelete = document.getElementById('btnDeleteMember');
-        if (isMe) {
-          btnDelete.classList.add('hidden');
-        } else {
-          btnDelete.classList.remove('hidden');
-          btnDelete.onclick = function() { promptDeleteMember(member.id); };
-        }
+        btnDelete.classList.toggle('hidden', isMe);
+        btnDelete.onclick = function() { promptDeleteMember(member.id); };
       }
 
-      modal.classList.remove('hidden');
+      document.getElementById('detailModal').classList.remove('hidden');
     }
 
     function closeDetailModal() {
@@ -1413,26 +2870,25 @@
         return;
       }
 
-      const member = familyMembers.find(m => m.id === id);
+      const member = byId(id);
       if (!member) return;
 
       openConfirmModal(
         "Hapus Anggota Keluarga",
         `Apakah Anda yakin ingin menghapus "${member.name}" dari peta silsilah?`,
-        function() {
-          executeDeleteMember(id);
-        }
+        function() { executeDeleteMember(id); }
       );
     }
 
     function executeDeleteMember(id) {
       familyMembers = familyMembers.filter(m => m.id !== id);
-
       familyMembers.forEach(m => {
         if (m.fatherId === id) m.fatherId = null;
         if (m.motherId === id) m.motherId = null;
-        if (m.spouseId === id) m.spouseId = null;
-        m.childrenIds = (m.childrenIds || []).filter(cId => cId !== id);
+        if (m.siblingOfId === id) m.siblingOfId = null;
+        if (Array.isArray(m.spouses)) {
+          m.spouses = m.spouses.filter(s => s.id !== id);
+        }
       });
 
       saveData();
@@ -1446,9 +2902,9 @@
 
       openConfirmModal(
         "Reset Seluruh Data",
-        "Apakah Anda yakin ingin menghapus seluruh silsilah dan memulai kembali dari awal?",
+        "Seluruh silsilah akan dihapus dan dimulai dari awal. Disarankan ekspor JSON dulu sebagai cadangan. Lanjutkan?",
         function() {
-          localStorage.removeItem(STORAGE_KEY);
+          try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
           familyMembers = [];
           meId = null;
           location.reload();
@@ -1456,204 +2912,153 @@
       );
     }
 
-    // --- EXPORT NATIVE SVG (FIX BERDEMPETAN & MULTI-LINE TEXT) ---
-function exportSVG() {
-  showToast("Menyiapkan file Vektor SVG...");
-
-  if (!networkGraph || familyMembers.length === 0) {
-    showToast("Data silsilah kosong!", "error");
-    return;
-  }
-
-  const positions = networkGraph.getPositions();
-
-  // 1. Fungsi untuk memecah teks panjang menjadi beberapa baris (Text Wrapping)
-  function wrapText(text, maxCharsPerLine = 18) {
-    const words = text.split(' ');
-    const lines = [];
-    let currentLine = '';
-
-    words.forEach(word => {
-      if ((currentLine + ' ' + word).trim().length <= maxCharsPerLine) {
-        currentLine = (currentLine + ' ' + word).trim();
-      } else {
-        if (currentLine) lines.push(currentLine);
-        currentLine = word;
+    // ================= EKSPOR VEKTOR SVG =================
+    function exportSVG() {
+      if (!networkGraph || familyMembers.length === 0) {
+        showToast("Data silsilah kosong!", "error");
+        return;
       }
-    });
-    if (currentLine) lines.push(currentLine);
-    return lines;
-  }
+      showToast("Membangun vektor SVG tajam...");
 
-  // 2. Hitung dimensi dinamis tiap node
-  const nodeDimensions = {};
+      const positions = networkGraph.getPositions();
+      const dims = {};
+      familyMembers.forEach(m => { dims[m.id] = getNodeMetrics(m); });
 
-  familyMembers.forEach(m => {
-    let displayName = m.name;
-    if (m.nickname && m.nickname !== m.name) {
-      displayName = `${m.name} (${m.nickname})`;
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      familyMembers.forEach(m => {
+        const pos = positions[m.id];
+        const d = dims[m.id];
+        if (!pos) return;
+        minX = Math.min(minX, pos.x - d.width / 2);
+        maxX = Math.max(maxX, pos.x + d.width / 2);
+        minY = Math.min(minY, pos.y - d.height / 2);
+        maxY = Math.max(maxY, pos.y + d.height / 2);
+      });
+
+      const margin = 140;
+      minX -= margin; minY -= margin; maxX += margin; maxY += margin;
+      const svgWidth = Math.ceil(maxX - minX);
+      const svgHeight = Math.ceil(maxY - minY);
+
+      let svg = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+      svg += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${minX} ${minY} ${svgWidth} ${svgHeight}" width="${svgWidth}" height="${svgHeight}" style="background-color:#ffffff;font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,sans-serif;">\n`;
+      svg += `<rect x="${minX}" y="${minY}" width="${svgWidth}" height="${svgHeight}" fill="#ffffff"/>\n`;
+
+      const marriages = new Set();
+      const processedChildrenSVG = new Set();
+
+      familyMembers.forEach(m => {
+        m.spouses.forEach(s => {
+          if (positions[s.id]) {
+            const pairKey = [m.id, s.id].sort((a, b) => a - b).join('_');
+            if (!marriages.has(pairKey)) {
+              marriages.add(pairKey);
+
+              const spouseObj = byId(s.id);
+              const posM = positions[m.id];
+              const posS = positions[s.id];
+              const midX = (posM.x + posS.x) / 2;
+              const midY = (posM.y + posS.y) / 2;
+              const label = pairLabel(m, spouseObj, s.status);
+              const w = Math.max(80, label.length * 6.5 + 20);
+              const isDivorced = s.status === 'divorced';
+
+              svg += `<line x1="${posM.x}" y1="${posM.y}" x2="${posS.x}" y2="${posS.y}" stroke="${isDivorced ? PALETTE.marriageDivorced : PALETTE.marriage}" stroke-width="${isDivorced ? 1.5 : 2.5}" stroke-dasharray="${isDivorced ? '3,4' : '6,5'}" />\n`;
+              svg += `<rect x="${midX - w / 2}" y="${midY - 10}" width="${w}" height="20" rx="6" fill="#ffffff" stroke="${isDivorced ? PALETTE.marriageDivorced : PALETTE.marriage}" stroke-width="1.5" />\n`;
+              svg += `<text x="${midX}" y="${midY}" font-size="9" font-weight="bold" fill="${isDivorced ? '#737373' : '#171717'}" text-anchor="middle" dominant-baseline="central">${escapeHtml(label)}</text>\n`;
+
+              const commonChildren = familyMembers.filter(c => 
+                (c.fatherId === m.id && c.motherId === spouseObj.id) ||
+                (c.fatherId === spouseObj.id && c.motherId === m.id)
+              );
+
+              commonChildren.forEach(child => {
+                processedChildrenSVG.add(child.id);
+                const posC = positions[child.id];
+                const dimC = dims[child.id];
+                if (posC) {
+                  svg += `<line x1="${midX}" y1="${midY + 10}" x2="${posC.x}" y2="${posC.y - dimC.height / 2}" stroke="${PALETTE.fatherEdge}" stroke-width="2.5" />\n`;
+                }
+              });
+            }
+          }
+        });
+      });
+
+      familyMembers.forEach(m => {
+        const posM = positions[m.id];
+        const dimM = dims[m.id];
+        if (!posM) return;
+
+        if (!processedChildrenSVG.has(m.id)) {
+          [['fatherId', PALETTE.fatherEdge], ['motherId', PALETTE.motherEdge]].forEach(([slot, color]) => {
+            const pid = m[slot];
+            if (!pid || !positions[pid]) return;
+            const posP = positions[pid];
+            const dimP = dims[pid];
+            svg += `<line x1="${posP.x}" y1="${posP.y + dimP.height / 2}" x2="${posM.x}" y2="${posM.y - dimM.height / 2}" stroke="${color}" stroke-width="2.5" />\n`;
+          });
+        }
+
+        if (m.siblingOfId && !m.fatherId && !m.motherId && positions[m.siblingOfId]) {
+          const posS = positions[m.siblingOfId];
+          svg += `<line x1="${posS.x}" y1="${posS.y}" x2="${posM.x}" y2="${posM.y}" stroke="${PALETTE.sibling}" stroke-width="2" stroke-dasharray="2,4" />\n`;
+        }
+      });
+
+      familyMembers.forEach(m => {
+        const pos = positions[m.id];
+        const d = dims[m.id];
+        if (!pos) return;
+
+        const isMe = m.id === meId;
+        const st = nodeStyle(m);
+        const dash = m.isAlive ? '' : ' stroke-dasharray="4,4"';
+
+        svg += `<g class="member-node" id="node-${m.id}">\n`;
+        svg += `<rect x="${pos.x - d.width / 2}" y="${pos.y - d.height / 2}" width="${d.width}" height="${d.height}" rx="12" fill="${st.bg}" stroke="${st.border}" stroke-width="${isMe ? 3 : 2}"${dash} />\n`;
+
+        const lineHeight = 17;
+        const allLines = d.nameLines.length + d.subtitles.length;
+        let ty = pos.y - (allLines * lineHeight) / 2 + lineHeight / 2;
+
+        d.nameLines.forEach(line => {
+          svg += `<text x="${pos.x}" y="${ty}" font-size="13" font-weight="${isMe ? 'bold' : '600'}" fill="${st.text}" text-anchor="middle" dominant-baseline="central">${escapeHtml(line)}</text>\n`;
+          ty += lineHeight;
+        });
+        d.subtitles.forEach(sub => {
+          svg += `<text x="${pos.x}" y="${ty}" font-size="11" font-weight="bold" fill="${isMe ? '#ffffff' : '#737373'}" text-anchor="middle" dominant-baseline="central">${escapeHtml(sub)}</text>\n`;
+          ty += lineHeight;
+        });
+        svg += `</g>\n`;
+      });
+
+      svg += `</svg>`;
+
+      const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `silsilah_keluarga_VEKTOR_${new Date().toISOString().slice(0, 10)}.svg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+
+      showToast("File vektor SVG tajam berhasil diunduh!");
     }
 
-    const lines = wrapText(displayName, 16);
-    const isMe = m.id === meId;
-    const hasSubtitle = isMe || !m.isAlive;
-
-    // Hitung lebar & tinggi berdasarkan jumlah baris teks
-    const maxLineLen = Math.max(...lines.map(l => l.length));
-    const boxWidth = Math.max(140, maxLineLen * 8.5 + 24);
-    const lineHeight = 14;
-    const boxHeight = Math.max(54, lines.length * lineHeight + (hasSubtitle ? 24 : 16));
-
-    nodeDimensions[m.id] = {
-      width: boxWidth,
-      height: boxHeight,
-      lines: lines,
-      hasSubtitle: hasSubtitle
-    };
-  });
-
-  // 3. Hitung area kanvas SVG (Bounding Box dengan Margin Aman)
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-
-  familyMembers.forEach(m => {
-    const pos = positions[m.id];
-    const dim = nodeDimensions[m.id] || { width: 140, height: 54 };
-    if (pos) {
-      const halfW = dim.width / 2;
-      const halfH = dim.height / 2;
-      if (pos.x - halfW < minX) minX = pos.x - halfW;
-      if (pos.x + halfW > maxX) maxX = pos.x + halfW;
-      if (pos.y - halfH < minY) minY = pos.y - halfH;
-      if (pos.y + halfH > maxY) maxY = pos.y + halfH;
-    }
-  });
-
-  const margin = 120;
-  minX -= margin;
-  minY -= margin;
-  maxX += margin;
-  maxY += margin;
-
-  const svgWidth = maxX - minX;
-  const svgHeight = maxY - minY;
-
-  // 4. Header SVG
-  let svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${minX} ${minY} ${svgWidth} ${svgHeight}" width="${svgWidth}" height="${svgHeight}" style="background-color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif;">\n`;
-
-  const marriageEdges = new Set();
-
-  // 5. Render Garis Relasi (Edges)
-  familyMembers.forEach(m => {
-    const posM = positions[m.id];
-    const dimM = nodeDimensions[m.id];
-    if (!posM || !dimM) return;
-
-    // Garis Ayah -> Anak
-    if (m.fatherId && positions[m.fatherId]) {
-      const posP = positions[m.fatherId];
-      const dimP = nodeDimensions[m.fatherId];
-      svgContent += `<line x1="${posP.x}" y1="${posP.y + dimP.height / 2}" x2="${posM.x}" y2="${posM.y - dimM.height / 2}" stroke="#171717" stroke-width="2" />\n`;
-    }
-
-    // Garis Ibu -> Anak
-    if (m.motherId && m.motherId !== m.fatherId && positions[m.motherId]) {
-      const posP = positions[m.motherId];
-      const dimP = nodeDimensions[m.motherId];
-      svgContent += `<line x1="${posP.x}" y1="${posP.y + dimP.height / 2}" x2="${posM.x}" y2="${posM.y - dimM.height / 2}" stroke="#4b5563" stroke-width="2" />\n`;
-    }
-
-    // Garis Pasangan (Pernikahan)
-    if (m.spouseId && positions[m.spouseId]) {
-      const pairKey = [m.id, m.spouseId].sort().join('_');
-      if (!marriageEdges.has(pairKey)) {
-        marriageEdges.add(pairKey);
-        const posS = positions[m.spouseId];
-        svgContent += `<line x1="${posM.x}" y1="${posM.y}" x2="${posS.x}" y2="${posS.y}" stroke="#4b5563" stroke-width="2" stroke-dasharray="5,5" />\n`;
-      }
-    }
-  });
-
-  // 6. Render Kotak Anggota & Teks Bertingkat (Nodes)
-  familyMembers.forEach(m => {
-    const pos = positions[m.id];
-    const dim = nodeDimensions[m.id];
-    if (!pos || !dim) return;
-
-    const isMe = m.id === meId;
-    const isMale = m.gender === 'L';
-
-    let bgColor = isMale ? '#f3f4f6' : '#f9fafb';
-    let borderColor = isMale ? '#374151' : '#4b5563';
-    let textColor = isMale ? '#1f2937' : '#111827';
-
-    if (!m.isAlive) {
-      bgColor = '#e5e7eb';
-      borderColor = '#9ca3af';
-      textColor = '#6b7280';
-    }
-
-    if (isMe) {
-      bgColor = '#d1d5db';
-      borderColor = '#171717';
-      textColor = '#0a0a0a';
-    }
-
-    const rectX = pos.x - dim.width / 2;
-    const rectY = pos.y - dim.height / 2;
-
-    // Render Background Box
-    svgContent += `<rect x="${rectX}" y="${rectY}" width="${dim.width}" height="${dim.height}" rx="12" fill="${bgColor}" stroke="${borderColor}" stroke-width="${isMe ? 3 : 2}" />\n`;
-
-    // Render Teks Nama (Multi-line)
-    const lineHeight = 14;
-    const totalTextHeight = dim.lines.length * lineHeight;
-    let startY = pos.y - totalTextHeight / 2 + lineHeight / 2;
-
-    if (dim.hasSubtitle) {
-      startY -= 6;
-    }
-
-    dim.lines.forEach((line, index) => {
-      const currentY = startY + index * lineHeight;
-      svgContent += `<text x="${pos.x}" y="${currentY}" font-size="12" font-weight="${isMe ? 'bold' : '600'}" fill="${textColor}" text-anchor="middle" dominant-baseline="central">${escapeHtml(line)}</text>\n`;
-    });
-
-    // Render Subtitle ([SAYA] / Wafat)
-    const subtitleY = pos.y + totalTextHeight / 2 + 4;
-    if (isMe) {
-      svgContent += `<text x="${pos.x}" y="${subtitleY}" font-size="10" font-weight="bold" fill="#000000" text-anchor="middle" dominant-baseline="central">[ SAYA ]</text>\n`;
-    } else if (!m.isAlive) {
-      svgContent += `<text x="${pos.x}" y="${subtitleY}" font-size="10" fill="#6b7280" text-anchor="middle" dominant-baseline="central">(Wafat)</text>\n`;
-    }
-  });
-
-  svgContent += `</svg>`;
-
-  // 7. Unduh SVG
-  const blob = new Blob([svgContent], { type: "image/svg+xml;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `silsilah_keluarga_VEKTOR_${new Date().toISOString().slice(0,10)}.svg`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-
-  showToast("File Vektor SVG rapi dan siap cetak!");
-}
-
-
-
-    // --- EXPORT & IMPORT UTILITIES ---
+    // ================= EKSPOR & IMPOR JSON =================
     function exportJSON() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ meId, members: familyMembers }, null, 2));
+      const blob = new Blob([JSON.stringify({ meId, members: familyMembers }, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
-      anchor.setAttribute("href", dataStr);
-      anchor.setAttribute("download", `silsilah_keluarga_${new Date().toISOString().slice(0,10)}.json`);
+      anchor.href = url;
+      anchor.download = `silsilah_keluarga_${new Date().toISOString().slice(0, 10)}.json`;
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
       showToast("Data JSON berhasil diekspor!");
     }
 
@@ -1667,16 +3072,16 @@ function exportSVG() {
       reader.onload = function(e) {
         try {
           const parsed = JSON.parse(e.target.result);
-          if (parsed.members && Array.isArray(parsed.members)) {
-            familyMembers = parsed.members;
-            meId = parsed.meId || 1;
-            saveData();
-            renderAll();
-            showToast("Data silsilah berhasil diimpor!");
-          } else {
+          if (!parsed || !Array.isArray(parsed.members) || parsed.members.length === 0) {
             showToast("Format JSON tidak valid!", "error");
+            return;
           }
-        } catch(err) {
+          familyMembers = parsed.members;
+          meId = parsed.meId || null;
+          saveData();
+          renderAll();
+          showToast("Data silsilah berhasil diimpor!");
+        } catch (err) {
           showToast("Gagal membaca file JSON!", "error");
         }
       };
@@ -1684,26 +3089,23 @@ function exportSVG() {
       event.target.value = "";
     }
 
-    function showToast(msg, type = "success") {
-      const toast = document.getElementById('toast');
-      const msgEl = document.getElementById('toastMessage');
-      const iconEl = document.getElementById('toastIcon');
-
-      msgEl.innerText = msg;
-      if (type === "error") {
-        iconEl.className = "fa-solid fa-circle-exclamation text-gray-300 text-sm";
-      } else {
-        iconEl.className = "fa-solid fa-circle-check text-gray-400 text-sm";
+    // ================= KEYBOARD =================
+    document.addEventListener('keydown', function(e) {
+      if (e.key !== 'Escape') return;
+      const order = [
+        ['confirmModal', closeConfirmModal],
+        ['edgeTypeModal', closeEdgeTypeModal],
+        ['memberModal', closeMemberModal],
+        ['detailModal', closeDetailModal]
+      ];
+      for (const [id, closer] of order) {
+        if (!document.getElementById(id).classList.contains('hidden')) {
+          closer();
+          return;
+        }
       }
-
-      toast.classList.remove('translate-y-20', 'opacity-0');
-      toast.classList.add('translate-y-0', 'opacity-100');
-
-      setTimeout(() => {
-        toast.classList.remove('translate-y-0', 'opacity-100');
-        toast.classList.add('translate-y-20', 'opacity-0');
-      }, 3000);
-    }
+      if (isConnectingMode || isDeletingEdgeMode) exitSpecialCanvasModes();
+    });
   </script>
 </body>
 </html>
